@@ -81,6 +81,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const gameName = urlParams.get("game-name");
 
+    // Récupération des joueurs enregistrés dans localStorage
     const key = `joueurs_${gameName}`;
     const playerData = JSON.parse(localStorage.getItem(key)) || [];
 
@@ -95,10 +96,10 @@
     });
 
     // Vérifier si c'est le créateur de la partie (Joueur 1)
-    const isCreateur = localStorage.getItem("createur_partie") === gameName;
+    const createurPartie = localStorage.getItem("createur_partie");
 
     // Afficher le QR code et le bouton "Voir les joueurs connectés" seulement si c'est le joueur 1
-    if (isCreateur) {
+    if (createurPartie === gameName) {
       const qrUrl = `https://thibault21-jeu.github.io/monjeu-hollywood/page3.html?game-name=${encodeURIComponent(gameName)}`;
       document.getElementById("qr-code").innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrUrl)}&size=200x200" alt="QR Code">`;
       document.getElementById("voir-joueurs-btn").style.display = "inline-block"; // Afficher le bouton
