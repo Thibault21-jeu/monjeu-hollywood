@@ -99,12 +99,14 @@
       opacity: 0.5;
       pointer-events: none;
       transition: opacity 0.3s;
+      display: none; /* caché par défaut */
     }
 
     #generate-btn.active {
       opacity: 1;
       pointer-events: auto;
     }
+
   </style>
 </head>
 <body>
@@ -133,6 +135,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const gameName = urlParams.get("game-name");
     const character = urlParams.get("character");
+    const isCreateur = localStorage.getItem("createur_partie") === gameName;
 
     document.getElementById("game-name-display").textContent = gameName || "Nom inconnu";
     document.getElementById("character-display").textContent = character || "un personnage";
@@ -149,6 +152,25 @@
     function validateForm() {
       const valid = selectedRole === "innocent" || (selectedRole === "meurtrier" && selectedMobile !== "");
       generateBtn.classList.toggle("active", valid);
+
+      if (valid && isCreateur) {
+        generateBtn.style.display = "inline-block";
+      }
+
+      if (valid && !isCreateur) {
+        // Enregistrement et redirection directe vers suivi
+        const key = `joueurs_${gameName}`;
+        const existingData = JSON.parse(localStorage.getItem(key)) || [];
+        const currentPlayer = { character, role: selectedRole, mobile: selectedRole === "meurtrier" ? selectedMobile : "" };
+        const alreadyExists = existingData.some(p => p.character === character);
+
+        if (!alreadyExists) {
+          existingData.push(currentPlayer);
+          localStorage.setItem(key, JSON.stringify(existingData));
+        }
+
+        window.location.href = `suivi.html?game-name=${encodeURIComponent(gameName)}`;
+      }
     }
 
     function clearSelections() {
