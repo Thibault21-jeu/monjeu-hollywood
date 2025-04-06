@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR Code - Rejoindre la partie</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Code - Rejoindre la scène</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
   <style>
     body {
@@ -12,51 +12,99 @@
       font-family: 'Inter', sans-serif;
       text-align: center;
       padding: 2rem;
+      position: relative;
     }
 
     h1 {
       font-family: 'Playfair Display', serif;
-      color: #C9A227;
       font-size: 1.8rem;
+      color: #C9A227;
       margin-bottom: 1rem;
     }
 
-    p {
+    .subtitle {
       font-size: 1.1rem;
-      color: #F4F4F4;
+      font-style: italic;
       margin-bottom: 2rem;
     }
 
-    #qr-code img {
-      max-width: 250px;
-      border: 3px solid #D41427;
-      border-radius: 8px;
+    #qr-code {
+      margin-top: 2rem;
+    }
+
+    .btn-retour, #voir-joueurs-btn {
+      background-color: #D41427;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .btn-retour:hover, #voir-joueurs-btn:hover {
+      background-color: #e02a3b;
+    }
+
+    #retour-btn {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
     }
   </style>
 </head>
 <body>
-  <h1>Partagez ce QR code aux autres joueurs.</h1>
-  <p>Ils devront le scanner pour rejoindre la scène...</p>
+
+  <button class="btn-retour" id="retour-btn">← Retour</button>
+
+  <h1>Partagez ce QR code</h1>
+  <p class="subtitle">Les autres joueurs doivent le scanner pour rejoindre la scène…</p>
 
   <div id="qr-code"></div>
 
-  <script>
-    function toBase64(str) {
-      return btoa(unescape(encodeURIComponent(str)));
-    }
+  <button id="voir-joueurs-btn">Voir les joueurs connectés</button>
 
+  <script>
     const urlParams = new URLSearchParams(window.location.search);
     const gameName = urlParams.get("game-name");
     const character = urlParams.get("character");
     const role = urlParams.get("role");
-    const mobile = urlParams.get("mobile") || "";
+    const mobile = urlParams.get("mobile");
 
-    const dataObj = { gameName, character, role, mobile };
-    const dataStr = JSON.stringify(dataObj);
-    const base64Data = toBase64(dataStr);
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${base64Data}&size=250x250`;
+    // 🔐 Enregistrement du joueur dans localStorage
+    const key = `joueurs_${gameName}`;
+    const existingData = JSON.parse(localStorage.getItem(key)) || [];
 
+    const currentPlayer = { character, role, mobile };
+    const alreadyExists = existingData.some(p => p.character === character);
+
+    if (!alreadyExists) {
+      existingData.push(currentPlayer);
+      localStorage.setItem(key, JSON.stringify(existingData));
+    }
+
+    // 🔐 Génération du QR Code en base64
+    const data = { gameName, character, role, mobile };
+    const jsonString = JSON.stringify(data);
+    const base64 = btoa(jsonString);
+
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${base64}&size=200x200`;
     document.getElementById("qr-code").innerHTML = `<img src="${qrUrl}" alt="QR Code">`;
+
+    // 🔙 Bouton retour vers page 3
+    document.getElementById("retour-btn").addEventListener("click", () => {
+      const params = new URLSearchParams({
+        "game-name": gameName,
+        "character": character
+      });
+      window.location.href = `page3.html?${params.toString()}`;
+    });
+
+    // 📋 Bouton vers la page de suivi
+    document.getElementById("voir-joueurs-btn").addEventListener("click", () => {
+      window.location.href = `suivi.html?game-name=${encodeURIComponent(gameName)}`;
+    });
   </script>
 </body>
 </html>
