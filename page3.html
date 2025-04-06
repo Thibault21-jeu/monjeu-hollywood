@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Choix du camp</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
+  <title>Choix du rôle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
   <style>
     body {
       background-color: #1C1C1C;
@@ -16,206 +16,135 @@
 
     h1 {
       font-family: 'Playfair Display', serif;
-      color: #D41427;
-      text-align: left;
-      font-size: 1.5rem;
+      font-size: 2rem;
+      color: #C9A227;
+      margin-bottom: 1rem;
     }
 
-    .character-line {
-      font-size: 1.3rem;
+    h2 {
       font-style: italic;
-      margin: 1rem 0 0.5rem 0;
-      color: #F4F4F4;
-      text-align: left;
-    }
-
-    .casting-line {
       font-size: 1.2rem;
-      margin: 2rem 0 1rem;
-      color: #F4F4F4;
+      color: white;
+      margin-bottom: 2rem;
     }
 
-    .image-choice {
+    .partie {
+      color: #D41427;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .personnage {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .images {
       display: flex;
       justify-content: center;
       gap: 2rem;
-      flex-wrap: wrap;
       margin-bottom: 2rem;
     }
 
-    .role-img {
+    .images img {
       width: 150px;
-      height: auto;
-      cursor: pointer;
       border: 3px solid transparent;
-      border-radius: 8px;
-      transition: border-color 0.3s;
-    }
-
-    .role-img.selected {
-      border-color: #C9A227;
-    }
-
-    #mobile-buttons {
-      display: none;
-      margin-top: 1.5rem;
-    }
-
-    .button-group {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .choice-button {
-      background-color: #D41427;
-      color: #F4F4F4;
-      border: none;
-      border-radius: 8px;
-      padding: 1rem 1.5rem;
-      font-size: 1rem;
+      border-radius: 10px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: border 0.3s ease;
     }
 
-    .choice-button:hover {
+    .images img.selected {
+      border-color: #D41427;
+    }
+
+    .mobiles {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .mobiles button {
+      background-color: #D41427;
+      border: none;
+      color: white;
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .mobiles button:hover {
       background-color: #e02a3b;
     }
-
-    .choice-button.selected {
-      border: 3px solid #C9A227;
-    }
-
-    #generate-btn {
-      background-color: #D41427;
-      color: #F4F4F4;
-      border: none;
-      border-radius: 8px;
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-      opacity: 0.5;
-      pointer-events: none;
-      transition: opacity 0.3s;
-      display: none; /* caché par défaut */
-    }
-
-    #generate-btn.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
   </style>
 </head>
 <body>
 
-  <h1>Partie : <span id="game-name-display"></span></h1>
-  <p class="character-line">Je suis <span id="character-display"></span></p>
-  <p class="casting-line">C’est l’heure du casting… de quel côté êtes-vous vraiment ?</p>
+  <p class="partie" id="nom-partie"></p>
+  <h1>🎬 C’est l’heure du casting : de quel côté êtes-vous vraiment ?</h1>
+  <h2 id="phrase-personnage"></h2>
 
-  <div class="image-choice">
-    <img src="img/innocent.png" alt="Innocent" id="innocent-img" class="role-img">
-    <img src="img/meurtrier.png" alt="Meurtrier" id="meurtrier-img" class="role-img">
+  <div class="images">
+    <img src="img/innocent.png" alt="Innocent" id="innocent" />
+    <img src="img/meurtrier.png" alt="Meurtrier" id="meurtrier" />
   </div>
 
-  <div id="mobile-buttons">
-    <div class="button-group">
-      <button class="choice-button mobile-btn">Vengeance personnelle</button>
-      <button class="choice-button mobile-btn">Avidité</button>
-      <button class="choice-button mobile-btn">Passion & Jalousie</button>
-      <button class="choice-button mobile-btn">Protection d’un secret</button>
-    </div>
+  <div class="mobiles" id="mobiles">
+    <button data-mobile="Vengeance personnelle">Vengeance personnelle</button>
+    <button data-mobile="Avidité">Avidité</button>
+    <button data-mobile="Passion & Jalousie">Passion & Jalousie</button>
+    <button data-mobile="Protection d’un secret">Protection d’un secret</button>
   </div>
-
-  <button id="generate-btn">Générer le QR Code</button>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const gameName = urlParams.get("game-name");
-    const character = urlParams.get("character");
-    const isCreateur = localStorage.getItem("createur_partie") === gameName;
+    const params = new URLSearchParams(window.location.search);
+    const gameName = params.get("game-name");
+    const character = params.get("character");
 
-    document.getElementById("game-name-display").textContent = gameName || "Nom inconnu";
-    document.getElementById("character-display").textContent = character || "un personnage";
+    document.getElementById("nom-partie").textContent = `Partie : ${gameName}`;
+    document.getElementById("phrase-personnage").textContent = `Je suis ${character}`;
 
-    const innocentImg = document.getElementById("innocent-img");
-    const meurtrierImg = document.getElementById("meurtrier-img");
-    const mobileContainer = document.getElementById("mobile-buttons");
-    const mobileButtons = document.querySelectorAll(".mobile-btn");
-    const generateBtn = document.getElementById("generate-btn");
+    const innocentImg = document.getElementById("innocent");
+    const meurtrierImg = document.getElementById("meurtrier");
+    const mobilesDiv = document.getElementById("mobiles");
 
-    let selectedRole = null;
-    let selectedMobile = "";
+    let role = "";
+    let mobile = "";
 
-    function validateForm() {
-      const valid = selectedRole === "innocent" || (selectedRole === "meurtrier" && selectedMobile !== "");
-      generateBtn.classList.toggle("active", valid);
-
-      if (valid && isCreateur) {
-        generateBtn.style.display = "inline-block";
-      }
-
-      if (valid && !isCreateur) {
-        // Enregistrement et redirection directe vers suivi
-        const key = `joueurs_${gameName}`;
-        const existingData = JSON.parse(localStorage.getItem(key)) || [];
-        const currentPlayer = { character, role: selectedRole, mobile: selectedRole === "meurtrier" ? selectedMobile : "" };
-        const alreadyExists = existingData.some(p => p.character === character);
-
-        if (!alreadyExists) {
-          existingData.push(currentPlayer);
-          localStorage.setItem(key, JSON.stringify(existingData));
-        }
-
-        window.location.href = `suivi.html?game-name=${encodeURIComponent(gameName)}`;
-      }
-    }
-
-    function clearSelections() {
-      innocentImg.classList.remove("selected");
-      meurtrierImg.classList.remove("selected");
-      mobileButtons.forEach(btn => btn.classList.remove("selected"));
-      selectedMobile = "";
+    function goToPage4() {
+      const query = new URLSearchParams({
+        "game-name": gameName,
+        character,
+        role,
+        mobile
+      }).toString();
+      window.location.href = `page4.html?${query}`;
     }
 
     innocentImg.addEventListener("click", () => {
-      clearSelections();
-      selectedRole = "innocent";
+      role = "innocent";
+      mobile = "";
       innocentImg.classList.add("selected");
-      mobileContainer.style.display = "none";
-      validateForm();
+      meurtrierImg.classList.remove("selected");
+      mobilesDiv.style.display = "none";
+      setTimeout(goToPage4, 500);
     });
 
     meurtrierImg.addEventListener("click", () => {
-      clearSelections();
-      selectedRole = "meurtrier";
+      role = "meurtrier";
+      innocentImg.classList.remove("selected");
       meurtrierImg.classList.add("selected");
-      mobileContainer.style.display = "block";
-      validateForm();
+      mobilesDiv.style.display = "flex";
     });
 
-    mobileButtons.forEach(btn => {
+    document.querySelectorAll("#mobiles button").forEach(btn => {
       btn.addEventListener("click", () => {
-        mobileButtons.forEach(b => b.classList.remove("selected"));
-        btn.classList.add("selected");
-        selectedMobile = btn.textContent;
-        validateForm();
+        mobile = btn.dataset.mobile;
+        goToPage4();
       });
-    });
-
-    generateBtn.addEventListener("click", () => {
-      if (!generateBtn.classList.contains("active")) return;
-
-      const query = new URLSearchParams({
-        "game-name": gameName,
-        "character": character,
-        "role": selectedRole,
-        "mobile": selectedRole === "meurtrier" ? selectedMobile : ""
-      });
-
-      window.location.href = `page4.html?${query.toString()}`;
     });
   </script>
 

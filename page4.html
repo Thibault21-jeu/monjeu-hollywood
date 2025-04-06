@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QR Code - Rejoindre la scène</title>
+  <title>QR à partager</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
   <style>
     body {
@@ -12,106 +12,93 @@
       font-family: 'Inter', sans-serif;
       text-align: center;
       padding: 2rem;
-      position: relative;
     }
 
     h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
       color: #C9A227;
-      margin-bottom: 1rem;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
     }
 
-    .subtitle {
-      font-size: 1.1rem;
+    .phrase-cinema {
       font-style: italic;
-      margin-bottom: 2rem;
+      font-size: 1.1rem;
+      margin: 2rem 0;
+      color: #F4F4F4;
     }
 
-    #qr-code {
+    #qr-container img {
+      width: 300px;
+      height: 300px;
+      margin: 0 auto;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
       margin-top: 2rem;
     }
 
-    .btn-retour, #voir-joueurs-btn {
+    .btn {
       background-color: #D41427;
-      color: white;
       border: none;
+      color: white;
+      font-size: 1rem;
+      padding: 0.8rem 1.5rem;
       border-radius: 6px;
-      padding: 0.6rem 1rem;
       cursor: pointer;
-      font-size: 0.9rem;
-      margin-top: 1rem;
     }
 
-    .btn-retour:hover, #voir-joueurs-btn:hover {
+    .btn:hover {
       background-color: #e02a3b;
-    }
-
-    #retour-btn {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
     }
   </style>
 </head>
 <body>
 
-  <button class="btn-retour" id="retour-btn">← Retour</button>
+  <h1>QR Code à partager</h1>
 
-  <h1>Partagez ce QR code</h1>
-  <p class="subtitle">Les autres joueurs doivent le scanner pour rejoindre la scène…</p>
+  <p class="phrase-cinema">
+    🎬 <em>Partagez ce QR code aux autres joueurs… Ils doivent le scanner pour rejoindre la scène.</em>
+  </p>
 
-  <div id="qr-code"></div>
+  <div id="qr-container"></div>
 
-  <button id="voir-joueurs-btn" style="display:none;">Voir les joueurs connectés</button>
+  <div class="button-container">
+    <button class="btn" id="btn-retour">← Retour</button>
+    <button class="btn" id="btn-suivi">Voir les joueurs connectés</button>
+  </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const gameName = urlParams.get("game-name");
-    const character = urlParams.get("character");
-    const role = urlParams.get("role");
-    const mobile = urlParams.get("mobile");
+    const params = new URLSearchParams(window.location.search);
+    const gameName = params.get("game-name");
+    const character = params.get("character");
+    const role = params.get("role");
+    const mobile = params.get("mobile");
 
-    // 🔐 Enregistrement du joueur dans localStorage
+    // Générer le QR code à partager vers la page d’entrée des joueurs 2-10
+    const qrUrl = `https://thibault21-jeu.github.io/monjeu-hollywood/joueur2-entree.html?game-name=${encodeURIComponent(gameName)}`;
+    const qrImg = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrUrl)}&size=300x300" alt="QR Code">`;
+    document.getElementById("qr-container").innerHTML = qrImg;
+
+    // Enregistrer le joueur 1 dans le localStorage
+    const joueur = { character, role, mobile };
     const key = `joueurs_${gameName}`;
-    const existingData = JSON.parse(localStorage.getItem(key)) || [];
+    const joueurs = JSON.parse(localStorage.getItem(key)) || [];
+    joueurs.push(joueur);
+    localStorage.setItem(key, JSON.stringify(joueurs));
 
-    const currentPlayer = { character, role, mobile };
-    const alreadyExists = existingData.some(p => p.character === character);
+    // Boutons navigation
+    document.getElementById("btn-retour").onclick = () => {
+      window.location.href = `page3.html?game-name=${encodeURIComponent(gameName)}&character=${encodeURIComponent(character)}`;
+    };
 
-    if (!alreadyExists) {
-      existingData.push(currentPlayer);
-      localStorage.setItem(key, JSON.stringify(existingData));
-    }
-
-    // 🔐 Création de l'URL avec les paramètres nécessaires
-    const query = new URLSearchParams({
-      "game-name": gameName,
-      "character": character,
-      "role": role,
-      "mobile": mobile || ""  // Si aucun mobile, on envoie une valeur vide
-    });
-
-    // 🔐 Génération du QR Code
-    const qrUrl = `https://thibault21-jeu.github.io/monjeu-hollywood/page3.html?${query.toString()}`;
-    document.getElementById("qr-code").innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrUrl)}&size=200x200" alt="QR Code">`;
-
-    // 🔙 Bouton retour vers page 3
-    document.getElementById("retour-btn").addEventListener("click", () => {
-      const params = new URLSearchParams({
-        "game-name": gameName,
-        "character": character
-      });
-      window.location.href = `page3.html?${params.toString()}`;
-    });
-
-    // 📋 Bouton vers la page de suivi (affiché après génération du QR code)
-    document.getElementById("voir-joueurs-btn").addEventListener("click", () => {
+    document.getElementById("btn-suivi").onclick = () => {
       window.location.href = `suivi.html?game-name=${encodeURIComponent(gameName)}`;
-    });
-
-    // Afficher le bouton "Voir les joueurs connectés" après la génération du QR code
-    document.getElementById("voir-joueurs-btn").style.display = "block";
+    };
   </script>
+
 </body>
 </html>

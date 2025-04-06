@@ -18,14 +18,13 @@
       font-family: 'Playfair Display', serif;
       font-size: 2rem;
       color: #C9A227;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
     }
 
     h2 {
       font-size: 1.2rem;
-      color: #F4F4F4;
-      margin-top: 0.5rem;
-      margin-bottom: 2rem;
+      color: white;
+      margin-bottom: 1.5rem;
     }
 
     ul {
@@ -51,15 +50,11 @@
       padding: 0.8rem 1.5rem;
       font-size: 1rem;
       cursor: pointer;
-      margin: 1rem 0.5rem;
+      margin: 0.5rem;
     }
 
     .btn:hover {
       background-color: #e02a3b;
-    }
-
-    #qr-code, #voir-joueurs-btn {
-      display: none; /* Caché par défaut */
     }
   </style>
 </head>
@@ -71,42 +66,37 @@
   <div id="player-count"></div>
   <ul id="player-list"></ul>
 
-  <!-- Phrase modifiée ici -->
-  <p>🎬 *Patientez... Le rideau se lèvera quand le joueur qui a généré le Qr code lancera la partie.*</p>
-
-  <div id="qr-code"></div>
-  <button id="voir-joueurs-btn" class="btn">Voir les joueurs connectés</button>
+  <button class="btn" onclick="retourQR()">← Retour au QR code</button>
+  <button class="btn" id="btn-lancer">🎬 Le casting est complet, la partie commence !</button>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const gameName = urlParams.get("game-name");
 
-    // Récupération des joueurs enregistrés dans localStorage
     const key = `joueurs_${gameName}`;
-    const playerData = JSON.parse(localStorage.getItem(key)) || [];
+    const joueurs = JSON.parse(localStorage.getItem(key)) || [];
 
     document.getElementById("game-name-display").textContent = `Partie : ${gameName}`;
-    document.getElementById("player-count").textContent = `${playerData.length} joueur(s) connecté(s) :`;
+
+    const texteJoueurs = joueurs.length === 1
+      ? "1 joueur connecté :"
+      : `${joueurs.length} joueurs connectés :`;
+    document.getElementById("player-count").textContent = texteJoueurs;
 
     const list = document.getElementById("player-list");
-    playerData.forEach(player => {
+    joueurs.forEach(j => {
       const li = document.createElement("li");
-      li.textContent = player.character;
+      li.textContent = j.character;
       list.appendChild(li);
     });
 
-    // Vérifier si c'est le créateur de la partie (Joueur 1)
-    const createurPartie = localStorage.getItem("createur_partie");
-
-    // Afficher le QR code et le bouton "Voir les joueurs connectés" seulement si c'est le joueur 1
-    if (createurPartie === gameName) {
-      const qrUrl = `https://thibault21-jeu.github.io/monjeu-hollywood/page3.html?game-name=${encodeURIComponent(gameName)}`;
-      document.getElementById("qr-code").innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrUrl)}&size=200x200" alt="QR Code">`;
-      document.getElementById("voir-joueurs-btn").style.display = "inline-block"; // Afficher le bouton
-    } else {
-      document.getElementById("qr-code").style.display = "none"; // Ne pas afficher le QR code pour les autres
-      document.getElementById("voir-joueurs-btn").style.display = "none"; // Ne pas afficher le bouton pour les autres joueurs
+    function retourQR() {
+      window.location.href = `page4.html?game-name=${encodeURIComponent(gameName)}&character=${encodeURIComponent(joueurs[0].character)}&role=${encodeURIComponent(joueurs[0].role)}&mobile=${encodeURIComponent(joueurs[0].mobile || "")}`;
     }
+
+    document.getElementById("btn-lancer").addEventListener("click", () => {
+      alert("🎬 La partie commence !");
+    });
   </script>
 
 </body>

@@ -11,33 +11,27 @@
       color: #F4F4F4;
       font-family: 'Inter', sans-serif;
       padding: 2rem;
+      text-align: center;
     }
 
-    .logo {
+    img.logo {
       display: block;
-      max-width: 180px;
-      margin: 0 auto 1.5rem auto;
+      margin: 0 auto 1rem auto;
+      max-width: 350px; /* Agrandissement du logo */
     }
 
     h1 {
       font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
       color: #C9A227;
-      font-size: 2.5rem;
       margin-bottom: 1.5rem;
-      text-align: center;
     }
 
-    .intro {
-      text-align: center;
+    p.intro {
+      font-size: 1rem;
       font-style: italic;
       margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-
-    label {
-      display: block;
-      margin-top: 1rem;
-      font-weight: bold;
+      color: #F4F4F4;
     }
 
     input, button {
@@ -54,26 +48,11 @@
     button {
       margin-top: 2rem;
       background-color: #D41427;
-      color: #F4F4F4;
       cursor: pointer;
-      opacity: 0.5;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    button.active {
-      opacity: 1;
-      pointer-events: auto;
     }
 
     button:hover {
       background-color: #e02a3b;
-    }
-
-    .error {
-      color: #FF6B6B;
-      margin-top: 0.5rem;
-      text-align: center;
     }
   </style>
 </head>
@@ -82,52 +61,36 @@
   <img src="img/logo.png" alt="Logo du jeu" class="logo" />
 
   <p class="intro">
-    🎥 <strong>Bienvenue dans l’envers du décor.</strong><br>
-    Avant que le rideau ne se lève, chaque joueur doit tirer une carte Personnage…<br>
-    …et piocher au hasard une carte Suspect.<br>
-    La caméra tourne, <em>à vous de jouer.</em>
+    🎬 Il est temps d’entrer dans l’histoire…<br>
+    Chaque joueur tire une carte Personnage, puis pioche une carte Suspect.<br>
+    Pour commencer, entrez le nom de votre scénario.
   </p>
 
   <h1>Créer un scénario</h1>
 
-  <form id="start-form">
-    <label for="game-name">Nom du scénario</label>
-    <input type="text" id="game-name" name="game-name" required />
-    <p class="error" id="error-msg" style="display: none;">Ce nom est déjà utilisé. Choisissez un autre scénario.</p>
-
-    <button type="submit" id="start-button">Créer une partie</button>
+  <form id="game-form">
+    <input type="text" id="game-name" name="game-name" placeholder="Nom du scénario" required />
+    <button type="submit">Créer une partie</button>
   </form>
 
   <script>
-    const gameInput = document.getElementById("game-name");
-    const startButton = document.getElementById("start-button");
-    const errorMsg = document.getElementById("error-msg");
-
-    // Active le bouton si le champ n'est pas vide
-    gameInput.addEventListener("input", () => {
-      startButton.classList.toggle("active", gameInput.value.trim() !== "");
-      errorMsg.style.display = "none"; // cache l'erreur dès que l'utilisateur retape
-    });
-
-    document.getElementById("start-form").addEventListener("submit", function (e) {
+    document.getElementById("game-form").addEventListener("submit", function (e) {
       e.preventDefault();
-      const gameName = gameInput.value.trim();
+      const gameName = document.getElementById("game-name").value.trim();
 
-      // Récupère les noms déjà enregistrés dans localStorage
-      const saved = localStorage.getItem("scenariosEnCours");
-      const scenarios = saved ? JSON.parse(saved) : [];
-
-      // Vérifie si le nom existe déjà
-      if (scenarios.includes(gameName)) {
-        errorMsg.style.display = "block";
+      // Vérifie si un nom identique est déjà utilisé
+      const partiesEnCours = JSON.parse(localStorage.getItem("parties_en_cours") || "[]");
+      if (partiesEnCours.includes(gameName)) {
+        alert("Ce nom de scénario est déjà utilisé. Veuillez en choisir un autre.");
         return;
       }
 
-      // Sinon, l'ajoute à la liste
-      scenarios.push(gameName);
-      localStorage.setItem("scenariosEnCours", JSON.stringify(scenarios));
+      // Enregistrement du nom de partie
+      localStorage.setItem("createur_partie", gameName);
+      partiesEnCours.push(gameName);
+      localStorage.setItem("parties_en_cours", JSON.stringify(partiesEnCours));
 
-      // Redirige vers la page 2 avec le nom
+      // Redirection
       window.location.href = `page2.html?game-name=${encodeURIComponent(gameName)}`;
     });
   </script>
