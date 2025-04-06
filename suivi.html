@@ -57,6 +57,10 @@
     .btn:hover {
       background-color: #e02a3b;
     }
+
+    #qr-code, #voir-joueurs-btn {
+      display: none; /* Caché par défaut */
+    }
   </style>
 </head>
 <body>
@@ -67,7 +71,11 @@
   <div id="player-count"></div>
   <ul id="player-list"></ul>
 
-  <p>🎬 *Patientez... Le rideau se lèvera quand le joueur principal lancera la partie.*</p>
+  <!-- Modifié ici -->
+  <p>🎬 *Patientez... Le rideau se lèvera quand le joueur qui a généré le Qr code lancera la partie.*</p>
+
+  <div id="qr-code"></div>
+  <button id="voir-joueurs-btn" class="btn">Voir les joueurs connectés</button>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -86,8 +94,19 @@
       list.appendChild(li);
     });
 
-    // Désactive le bouton "Voir le QR Code"
-    document.getElementById("voir-joueurs-btn").style.display = "none";
+    // Vérifier si c'est le créateur de la partie (Joueur 1)
+    const isCreateur = localStorage.getItem("createur_partie") === gameName;
+
+    // Afficher le QR code et le bouton "Voir les joueurs connectés" seulement si c'est le joueur 1
+    if (isCreateur) {
+      const qrUrl = `https://thibault21-jeu.github.io/monjeu-hollywood/page3.html?game-name=${encodeURIComponent(gameName)}`;
+      document.getElementById("qr-code").innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrUrl)}&size=200x200" alt="QR Code">`;
+      document.getElementById("voir-joueurs-btn").style.display = "inline-block"; // Afficher le bouton
+    } else {
+      document.getElementById("qr-code").style.display = "none"; // Ne pas afficher le QR code pour les autres
+      document.getElementById("voir-joueurs-btn").style.display = "none"; // Ne pas afficher le bouton pour les autres joueurs
+    }
   </script>
+
 </body>
 </html>
