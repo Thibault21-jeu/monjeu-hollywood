@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Distribution des rôles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1C1C1C;
+      color: #F4F4F4;
+      font-family: 'Inter', sans-serif;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin: 0.5rem 0;
+    }
+
+    .partie-titre {
+      color: #D41427;
+      text-align: left;
+    }
+
+    .distribution-titre {
+      color: #C9A227;
+      text-align: center;
+    }
+
+    .role-text {
+      font-style: italic;
+      color: #F4F4F4;
+      font-size: 1.1rem;
+      margin: 1rem 0 0.5rem 0;
+      text-align: left;
+    }
+
+    .back-button {
+      background-color: #D41427;
+      color: #F4F4F4;
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 0.4rem;
+      font-size: 1rem;
+      cursor: pointer;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .back-button:hover {
+      background-color: #e02a3b;
+    }
+
+    .card-container {
+      display: grid;
+      grid-template-columns: 200px 200px; /* deux colonnes fixes */
+      gap: 20px 38px; /* 20px entre les lignes, 38px (~1cm) entre colonnes */
+      justify-content: center; /* centre toute la grille */
+      margin-top: 1.5rem;
+    }
+
+    .card {
+      width: 200px;
+      height: 300px;
+      border: 2px solid #8B1E3F;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .card img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .card.selected {
+      border: 3px solid #C9A227;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="back-button" id="back-to-page-1">Retour</button>
+
+  <h1 class="partie-titre">Partie : <span id="game-name-display"></span></h1>
+  <h1 class="distribution-titre">Distribution des rôles</h1>
+  <p class="role-text">Je suis...</p>
+
+  <div class="card-container">
+    <div class="card" data-character="L'Agent de Sécurité">
+      <img src="img/agent-securite.png" alt="L'Agent de Sécurité" />
+    </div>
+    <div class="card" data-character="L’Assistante de Production">
+      <img src="img/assistante-production.png" alt="L’Assistante de Production" />
+    </div>
+    <div class="card" data-character="L’Avocate des Stars">
+      <img src="img/avocate-stars.png" alt="L’Avocate des Stars" />
+    </div>
+    <div class="card" data-character="La Chroniqueuse Mondaine">
+      <img src="img/chroniqueuse-mondaine.png" alt="La Chroniqueuse Mondaine" />
+    </div>
+    <div class="card" data-character="La Maquilleuse de Stars">
+      <img src="img/maquilleuse-de-stars.png" alt="La Maquilleuse de Stars" />
+    </div>
+    <div class="card" data-character="La Figurante">
+      <img src="img/figurante.png" alt="La Figurante" />
+    </div>
+    <div class="card" data-character="Le Paparazzi">
+      <img src="img/paparazzi.png" alt="Le Paparazzi" />
+    </div>
+    <div class="card" data-character="Le Producteur">
+      <img src="img/producteur.png" alt="Le Producteur" />
+    </div>
+    <div class="card" data-character="Le Réalisateur">
+      <img src="img/realisateur.png" alt="Le Réalisateur" />
+    </div>
+    <div class="card" data-character="Le Scénariste">
+      <img src="img/scenariste.png" alt="Le Scénariste" />
+    </div>
+  </div>
+
+  <script>
+    // Affiche le nom de la partie depuis l'URL
+    const gameName = new URLSearchParams(window.location.search).get("game-name");
+    document.getElementById("game-name-display").textContent = gameName || "Nom inconnu";
+
+    // Sélection du personnage
+    const cards = document.querySelectorAll(".card");
+    cards.forEach(card => {
+      card.addEventListener("click", () => {
+        cards.forEach(c => c.classList.remove("selected"));
+        card.classList.add("selected");
+
+        const selectedCharacter = card.getAttribute("data-character");
+        const nextUrl = `page3.html?game-name=${encodeURIComponent(gameName)}&character=${encodeURIComponent(selectedCharacter)}`;
+        window.location.href = nextUrl;
+      });
+    });
+
+    // Bouton retour
+    document.getElementById("back-to-page-1").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+  </script>
+
+</body>
+</html>

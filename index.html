@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Créer une partie</title>
+  <title>Créer un scénario</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
   <style>
     body {
@@ -16,7 +16,7 @@
     .logo {
       display: block;
       max-width: 180px;
-      margin: 0 auto 1rem auto;
+      margin: 0 auto 1.5rem auto;
     }
 
     h1 {
@@ -27,13 +27,20 @@
       text-align: center;
     }
 
+    .intro {
+      text-align: center;
+      font-style: italic;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
     label {
       display: block;
       margin-top: 1rem;
       font-weight: bold;
     }
 
-    input, select, button {
+    input, button {
       width: 100%;
       padding: 0.6rem;
       margin-top: 0.5rem;
@@ -63,108 +70,67 @@
       background-color: #e02a3b;
     }
 
-    #qr-code {
-      margin-top: 2rem;
+    .error {
+      color: #FF6B6B;
+      margin-top: 0.5rem;
       text-align: center;
     }
   </style>
 </head>
 <body>
-  <img src="logo.png" alt="Logo du jeu" class="logo" />
-  <h1>Créer une partie</h1>
 
-  <form id="game-form">
-    <label for="game-name">Nom de la partie</label>
+  <img src="img/logo.png" alt="Logo du jeu" class="logo" />
+
+  <p class="intro">
+    🎥 <strong>Bienvenue dans l’envers du décor.</strong><br>
+    Avant que le rideau ne se lève, chaque joueur doit tirer une carte Personnage…<br>
+    …et piocher au hasard une carte Suspect.<br>
+    La caméra tourne, <em>à vous de jouer.</em>
+  </p>
+
+  <h1>Créer un scénario</h1>
+
+  <form id="start-form">
+    <label for="game-name">Nom du scénario</label>
     <input type="text" id="game-name" name="game-name" required />
+    <p class="error" id="error-msg" style="display: none;">Ce nom est déjà utilisé. Choisissez un autre scénario.</p>
 
-    <label for="character">Quel est ton personnage ?</label>
-    <select id="character" name="character" required>
-      <option value="">Choisir...</option>
-      <option>L'Agent de Sécurité</option>
-      <option>L’Assistante de Production</option>
-      <option>L’Avocate des Stars</option>
-      <option>La Chroniqueuse Mondaine</option>
-      <option>La Figurante</option>
-      <option>La Maquilleuse de Stars</option>
-      <option>Le Paparazzi</option>
-      <option>Le Producteur</option>
-      <option>Le Réalisateur</option>
-      <option>Le Scénariste</option>
-    </select>
-
-    <label for="role">Quel est ton rôle ?</label>
-    <select id="role" name="role" required>
-      <option value="">Choisir...</option>
-      <option value="innocent">Je suis Innocent</option>
-      <option value="meurtrier">Je suis le Meurtrier</option>
-    </select>
-
-    <div id="mobile-container" style="display:none">
-      <label for="mobile">Quel est ton mobile ?</label>
-      <select id="mobile" name="mobile">
-        <option value="">Choisir...</option>
-        <option>Vengeance personnelle</option>
-        <option>Avidité</option>
-        <option>Passion & Jalousie</option>
-        <option>Protection d’un secret</option>
-      </select>
-    </div>
-
-    <button type="submit" id="generate-btn">Générer le QR code</button>
+    <button type="submit" id="start-button">Créer une partie</button>
   </form>
 
-  <div id="qr-code"></div>
-
   <script>
-    const roleSelect = document.getElementById("role");
-    const mobileSelect = document.getElementById("mobile");
-    const mobileContainer = document.getElementById("mobile-container");
-    const generateBtn = document.getElementById("generate-btn");
-    const form = document.getElementById("game-form");
+    const gameInput = document.getElementById("game-name");
+    const startButton = document.getElementById("start-button");
+    const errorMsg = document.getElementById("error-msg");
 
-    function updateMobileVisibility() {
-      if (roleSelect.value === "meurtrier") {
-        mobileContainer.style.display = "block";
-      } else {
-        mobileContainer.style.display = "none";
-      }
-      validateForm();
-    }
-
-    function validateForm() {
-      const gameName = document.getElementById("game-name").value.trim();
-      const character = document.getElementById("character").value;
-      const role = roleSelect.value;
-      const mobile = mobileSelect.value;
-
-      const isValid =
-        gameName !== "" &&
-        character !== "" &&
-        role !== "" &&
-        (role === "innocent" || (role === "meurtrier" && mobile !== ""));
-
-      generateBtn.classList.toggle("active", isValid);
-    }
-
-    roleSelect.addEventListener("change", updateMobileVisibility);
-    form.addEventListener("input", validateForm);
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const gameName = document.getElementById("game-name").value;
-      const character = document.getElementById("character").value;
-      const role = document.getElementById("role").value;
-      const mobile = document.getElementById("mobile").value;
-
-      const data = encodeURIComponent(JSON.stringify({ gameName, character, role, mobile }));
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${data}&size=200x200`;
-
-      document.getElementById("qr-code").innerHTML = `<img src="${qrUrl}" alt="QR Code">`;
+    // Active le bouton si le champ n'est pas vide
+    gameInput.addEventListener("input", () => {
+      startButton.classList.toggle("active", gameInput.value.trim() !== "");
+      errorMsg.style.display = "none"; // cache l'erreur dès que l'utilisateur retape
     });
 
-    // Initialisation
-    updateMobileVisibility();
+    document.getElementById("start-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const gameName = gameInput.value.trim();
+
+      // Récupère les noms déjà enregistrés dans localStorage
+      const saved = localStorage.getItem("scenariosEnCours");
+      const scenarios = saved ? JSON.parse(saved) : [];
+
+      // Vérifie si le nom existe déjà
+      if (scenarios.includes(gameName)) {
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      // Sinon, l'ajoute à la liste
+      scenarios.push(gameName);
+      localStorage.setItem("scenariosEnCours", JSON.stringify(scenarios));
+
+      // Redirige vers la page 2 avec le nom
+      window.location.href = `page2.html?game-name=${encodeURIComponent(gameName)}`;
+    });
   </script>
+
 </body>
 </html>
