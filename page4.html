@@ -89,7 +89,7 @@
     const jsonString = JSON.stringify(data);
     const base64 = btoa(jsonString);
 
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${base64}&size=200x200`;
+    const qrUrl = `https://thibault21-jeu.github.io/page3.html?${query.toString()}`;
     document.getElementById("qr-code").innerHTML = `<img src="${qrUrl}" alt="QR Code">`;
 
     // 🔙 Bouton retour vers page 3
