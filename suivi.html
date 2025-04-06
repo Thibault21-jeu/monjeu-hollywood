@@ -67,13 +67,7 @@
   <div id="player-count"></div>
   <ul id="player-list"></ul>
 
-  <!-- Bouton visible seulement pour le créateur -->
-  <button class="btn" id="start-btn" style="display: none;">Le casting est complet, la partie commence !</button>
-
-  <!-- Phrase immersive pour les autres joueurs -->
-  <p id="waiting-text" style="display: none;">🎬 Patientez... Le rideau se lèvera quand le joueur principal lancera la partie.</p>
-
-  <button class="btn" id="return-btn">← Revoir le QR code</button>
+  <p>🎬 *Patientez... Le rideau se lèvera quand le joueur principal lancera la partie.*</p>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -92,25 +86,8 @@
       list.appendChild(li);
     });
 
-    const isCreateur = localStorage.getItem("createur_partie") === gameName;
-
-    if (isCreateur) {
-      // Affiche le bouton pour commencer la partie
-      document.getElementById("start-btn").style.display = "inline-block";
-    } else {
-      // Affiche la phrase pour les autres joueurs
-      document.getElementById("waiting-text").style.display = "block";
-    }
-
-    // Bouton retour au QR code
-    document.getElementById("return-btn").addEventListener("click", () => {
-      window.location.href = `page4.html?game-name=${encodeURIComponent(gameName)}`;
-    });
-
-    // Bouton démarrer la partie (seulement pour le créateur)
-    document.getElementById("start-btn").addEventListener("click", () => {
-      alert("🎬 À venir : redirection vers l’écran de jeu !");
-    });
+    // Désactive le bouton "Voir le QR Code"
+    document.getElementById("voir-joueurs-btn").style.display = "none";
   </script>
 </body>
 </html>
