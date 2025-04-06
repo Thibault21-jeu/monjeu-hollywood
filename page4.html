@@ -63,7 +63,7 @@
 
   <div id="qr-code"></div>
 
-  <button id="voir-joueurs-btn">Voir les joueurs connectés</button>
+  <button id="voir-joueurs-btn" style="display:none;">Voir les joueurs connectés</button>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -105,10 +105,13 @@
       window.location.href = `page3.html?${params.toString()}`;
     });
 
-    // 📋 Bouton vers la page de suivi
+    // 📋 Bouton vers la page de suivi (affiché après génération du QR code)
     document.getElementById("voir-joueurs-btn").addEventListener("click", () => {
       window.location.href = `suivi.html?game-name=${encodeURIComponent(gameName)}`;
     });
+
+    // Afficher le bouton "Voir les joueurs connectés" après la génération du QR code
+    document.getElementById("voir-joueurs-btn").style.display = "block";
   </script>
 </body>
 </html>
