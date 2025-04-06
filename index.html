@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Créer une partie</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1C1C1C;
+      color: #F4F4F4;
+      font-family: 'Inter', sans-serif;
+      padding: 2rem;
+    }
+
+    .logo {
+      display: block;
+      max-width: 180px;
+      margin: 0 auto 1rem auto;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      color: #C9A227;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.5rem;
+      background-color: #2E2E2E;
+      color: #F4F4F4;
+      border: 1px solid #D41427;
+      border-radius: 0.4rem;
+      font-size: 1rem;
+    }
+
+    button {
+      margin-top: 2rem;
+      background-color: #D41427;
+      color: #F4F4F4;
+      cursor: pointer;
+      opacity: 0.5;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    button.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    button:hover {
+      background-color: #e02a3b;
+    }
+
+    #qr-code {
+      margin-top: 2rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <img src="logo.png" alt="Logo du jeu" class="logo" />
+  <h1>Créer une partie</h1>
+
+  <form id="game-form">
+    <label for="game-name">Nom de la partie</label>
+    <input type="text" id="game-name" name="game-name" required />
+
+    <label for="character">Quel est ton personnage ?</label>
+    <select id="character" name="character" required>
+      <option value="">Choisir...</option>
+      <option>L'Agent de Sécurité</option>
+      <option>L’Assistante de Production</option>
+      <option>L’Avocate des Stars</option>
+      <option>La Chroniqueuse Mondaine</option>
+      <option>La Figurante</option>
+      <option>La Maquilleuse de Stars</option>
+      <option>Le Paparazzi</option>
+      <option>Le Producteur</option>
+      <option>Le Réalisateur</option>
+      <option>Le Scénariste</option>
+    </select>
+
+    <label for="role">Quel est ton rôle ?</label>
+    <select id="role" name="role" required>
+      <option value="">Choisir...</option>
+      <option value="innocent">Je suis Innocent</option>
+      <option value="meurtrier">Je suis le Meurtrier</option>
+    </select>
+
+    <div id="mobile-container" style="display:none">
+      <label for="mobile">Quel est ton mobile ?</label>
+      <select id="mobile" name="mobile">
+        <option value="">Choisir...</option>
+        <option>Vengeance personnelle</option>
+        <option>Avidité</option>
+        <option>Passion & Jalousie</option>
+        <option>Protection d’un secret</option>
+      </select>
+    </div>
+
+    <button type="submit" id="generate-btn">Générer le QR code</button>
+  </form>
+
+  <div id="qr-code"></div>
+
+  <script>
+    const roleSelect = document.getElementById("role");
+    const mobileSelect = document.getElementById("mobile");
+    const mobileContainer = document.getElementById("mobile-container");
+    const generateBtn = document.getElementById("generate-btn");
+    const form = document.getElementById("game-form");
+
+    function updateMobileVisibility() {
+      if (roleSelect.value === "meurtrier") {
+        mobileContainer.style.display = "block";
+      } else {
+        mobileContainer.style.display = "none";
+      }
+      validateForm();
+    }
+
+    function validateForm() {
+      const gameName = document.getElementById("game-name").value.trim();
+      const character = document.getElementById("character").value;
+      const role = roleSelect.value;
+      const mobile = mobileSelect.value;
+
+      const isValid =
+        gameName !== "" &&
+        character !== "" &&
+        role !== "" &&
+        (role === "innocent" || (role === "meurtrier" && mobile !== ""));
+
+      generateBtn.classList.toggle("active", isValid);
+    }
+
+    roleSelect.addEventListener("change", updateMobileVisibility);
+    form.addEventListener("input", validateForm);
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const gameName = document.getElementById("game-name").value;
+      const character = document.getElementById("character").value;
+      const role = document.getElementById("role").value;
+      const mobile = document.getElementById("mobile").value;
+
+      const data = encodeURIComponent(JSON.stringify({ gameName, character, role, mobile }));
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${data}&size=200x200`;
+
+      document.getElementById("qr-code").innerHTML = `<img src="${qrUrl}" alt="QR Code">`;
+    });
+
+    // Initialisation
+    updateMobileVisibility();
+  </script>
+</body>
+</html>
