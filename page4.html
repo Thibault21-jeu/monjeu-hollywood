@@ -84,13 +84,17 @@
       localStorage.setItem(key, JSON.stringify(existingData));
     }
 
-    // 🔐 Génération du QR Code en base64
-    const data = { gameName, character, role, mobile };
-    const jsonString = JSON.stringify(data);
-    const base64 = btoa(jsonString);
+    // 🔐 Création de l'URL avec les paramètres nécessaires
+    const query = new URLSearchParams({
+      "game-name": gameName,
+      "character": character,
+      "role": role,
+      "mobile": mobile || ""  // Si aucun mobile, on envoie une valeur vide
+    });
 
+    // 🔐 Génération du QR Code
     const qrUrl = `https://thibault21-jeu.github.io/page3.html?${query.toString()}`;
-    document.getElementById("qr-code").innerHTML = `<img src="${qrUrl}" alt="QR Code">`;
+    document.getElementById("qr-code").innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrUrl)}&size=200x200" alt="QR Code">`;
 
     // 🔙 Bouton retour vers page 3
     document.getElementById("retour-btn").addEventListener("click", () => {
