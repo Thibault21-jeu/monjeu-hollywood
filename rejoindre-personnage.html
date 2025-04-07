@@ -80,14 +80,14 @@
     const gameName = params.get("game-name");
     document.getElementById("titre-partie").textContent = `Partie : ${gameName}`;
 
+    localStorage.setItem("nom_partie", gameName);
+
     document.querySelectorAll('.card').forEach(card => {
       card.addEventListener('click', () => {
         const character = card.getAttribute("data-character");
         window.location.href = `rejoindre-role.html?game-name=${encodeURIComponent(gameName)}&character=${encodeURIComponent(character)}`;
       });
     });
-
-    localStorage.setItem("nom_partie", gameName);
   </script>
 
 </body>
