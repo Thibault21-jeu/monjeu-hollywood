@@ -83,7 +83,8 @@
       localStorage.setItem(key, JSON.stringify(joueurs));
     }
 
-    const qrURL = `${window.location.origin}/rejoindre-personnage.html?game-name=${encodeURIComponent(gameName)}`;
+    // 🔥 Lien adapté à GitHub Pages (sous-dossier /monjeu-hollywood/)
+    const qrURL = `${window.location.origin}/monjeu-hollywood/rejoindre-personnage.html?game-name=${encodeURIComponent(gameName)}`;
     QRCode.toCanvas(qrURL, { width: 200 }, function (err, canvas) {
       if (err) {
         console.error("Erreur QR code :", err);
