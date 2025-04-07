@@ -5,13 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Choix du rôle</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+
+  <!-- Préchargement des images rôles -->
+  <link rel="preload" as="image" href="img/logo.png">
+  <link rel="preload" as="image" href="img/innocent.png">
+  <link rel="preload" as="image" href="img/meurtrier.png">
+
   <style>
     body {
       background-color: #1C1C1C;
       color: #F4F4F4;
       font-family: 'Inter', sans-serif;
-      padding: 2rem;
       text-align: center;
+      padding: 2rem;
     }
 
     h1 {
@@ -19,24 +25,6 @@
       font-size: 2rem;
       color: #C9A227;
       margin-bottom: 1rem;
-    }
-
-    h2 {
-      font-style: italic;
-      font-size: 1.2rem;
-      color: white;
-      margin-bottom: 2rem;
-    }
-
-    .partie {
-      color: #D41427;
-      font-size: 1.3rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .personnage {
-      font-size: 1.2rem;
-      margin-bottom: 1.5rem;
     }
 
     .images {
@@ -83,9 +71,7 @@
 </head>
 <body>
 
-  <p class="partie" id="nom-partie"></p>
-  <h1>🎬 C’est l’heure du casting : de quel côté êtes-vous vraiment ?</h1>
-  <h2 id="phrase-personnage"></h2>
+  <h1 id="info"></h1>
 
   <div class="images">
     <img src="img/innocent.png" alt="Innocent" id="innocent" />
@@ -100,11 +86,10 @@
   </div>
 
   <script>
-    const gameName = localStorage.getItem("nom_partie");
-    const character = localStorage.getItem("personnage");
-
-    document.getElementById("nom-partie").textContent = `Partie : ${gameName}`;
-    document.getElementById("phrase-personnage").textContent = `Je suis ${character}`;
+    const params = new URLSearchParams(window.location.search);
+    const gameName = params.get("game-name");
+    const character = params.get("character");
+    document.getElementById("info").textContent = `Je suis ${character}`;
 
     const innocentImg = document.getElementById("innocent");
     const meurtrierImg = document.getElementById("meurtrier");
@@ -113,10 +98,17 @@
     let role = "";
     let mobile = "";
 
-    function goToNext() {
-      localStorage.setItem("role", role);
-      localStorage.setItem("mobile", mobile);
-      window.location.href = `rejoindre-final.html`;
+    function goToSuivi() {
+      const joueur = { personnage: character, role: role, mobile: mobile || "" };
+      const key = `joueurs_${gameName}`;
+      const joueurs = JSON.parse(localStorage.getItem(key) || "[]");
+
+      if (!joueurs.find(j => j.personnage === character)) {
+        joueurs.push(joueur);
+        localStorage.setItem(key, JSON.stringify(joueurs));
+      }
+
+      window.location.href = `suivi-joueur.html`;
     }
 
     innocentImg.addEventListener("click", () => {
@@ -125,7 +117,7 @@
       innocentImg.classList.add("selected");
       meurtrierImg.classList.remove("selected");
       mobilesDiv.style.display = "none";
-      setTimeout(goToNext, 500);
+      setTimeout(goToSuivi, 500);
     });
 
     meurtrierImg.addEventListener("click", () => {
@@ -138,7 +130,7 @@
     document.querySelectorAll("#mobiles button").forEach(btn => {
       btn.addEventListener("click", () => {
         mobile = btn.dataset.mobile;
-        goToNext();
+        goToSuivi();
       });
     });
   </script>

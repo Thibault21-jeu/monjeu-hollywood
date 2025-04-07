@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QR à partager</title>
+  <title>QR Code à partager</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+
+  <!-- Préchargement du logo -->
+  <link rel="preload" as="image" href="img/logo.png">
+
   <style>
     body {
       background-color: #1C1C1C;
@@ -16,61 +20,72 @@
 
     h1 {
       font-family: 'Playfair Display', serif;
-      color: #C9A227;
       font-size: 2rem;
-      margin-bottom: 1.5rem;
+      color: #C9A227;
+      margin-bottom: 1rem;
     }
 
-    .phrase-cinema {
-      font-style: italic;
-      font-size: 1.1rem;
-      margin: 2rem 0;
-      color: #F4F4F4;
+    #qrcode {
+      margin: 2rem auto;
     }
 
-    #qr-container img {
-      width: 300px;
-      height: 300px;
-      margin: 0 auto;
-    }
-
-    .button-container {
+    .btn-container {
       display: flex;
       justify-content: center;
-      gap: 2rem;
+      gap: 1rem;
       margin-top: 2rem;
     }
 
-    .btn {
+    button {
       background-color: #D41427;
-      border: none;
       color: white;
-      font-size: 1rem;
+      border: none;
       padding: 0.8rem 1.5rem;
       border-radius: 6px;
       cursor: pointer;
+      font-size: 1rem;
     }
 
-    .btn:hover {
+    button:hover {
       background-color: #e02a3b;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      color: #C9A227;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background-color: #2E2E2E;
+      margin: 0.4rem auto;
+      padding: 0.6rem 1rem;
+      border-left: 4px solid #D41427;
+      width: fit-content;
+      border-radius: 4px;
     }
   </style>
 </head>
 <body>
 
-  <h1>QR Code à partager</h1>
+  <h1>🎬 Scannez ce QR code pour rejoindre la partie</h1>
+  <div id="qrcode"></div>
 
-  <p class="phrase-cinema">
-    🎬 <em>Partagez ce QR code aux autres joueurs… Ils doivent le scanner pour rejoindre la scène.</em>
-  </p>
-
-  <div id="qr-container"></div>
-
-  <div class="button-container">
-    <button class="btn" id="btn-retour">← Retour</button>
-    <button class="btn" id="btn-suivi">Voir les joueurs connectés</button>
+  <div class="btn-container">
+    <button onclick="goBack()">← Retour</button>
+    <button onclick="goToSuivi()">Voir les joueurs connectés</button>
   </div>
 
+  <h2>Joueurs connectés :</h2>
+  <ul id="player-list"></ul>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
     const gameName = params.get("game-name");
@@ -78,26 +93,47 @@
     const role = params.get("role");
     const mobile = params.get("mobile");
 
-    // Générer le QR code à partager vers la page d’entrée des joueurs 2-10
-    const qrUrl = `https://thibault21-jeu.github.io/monjeu-hollywood/joueur2-entree.html?game-name=${encodeURIComponent(gameName)}`;
-    const qrImg = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrUrl)}&size=300x300" alt="QR Code">`;
-    document.getElementById("qr-container").innerHTML = qrImg;
+    // Enregistre le joueur 1 dans la partie
+    const joueur = {
+      personnage: character,
+      role: role,
+      mobile: mobile || ""
+    };
 
-    // Enregistrer le joueur 1 dans le localStorage
-    const joueur = { character, role, mobile };
     const key = `joueurs_${gameName}`;
-    const joueurs = JSON.parse(localStorage.getItem(key)) || [];
-    joueurs.push(joueur);
-    localStorage.setItem(key, JSON.stringify(joueurs));
+    let joueurs = JSON.parse(localStorage.getItem(key) || "[]");
 
-    // Boutons navigation
-    document.getElementById("btn-retour").onclick = () => {
+    if (!joueurs.find(j => j.personnage === character)) {
+      joueurs.push(joueur);
+      localStorage.setItem(key, JSON.stringify(joueurs));
+    }
+
+    // Génère le QR code pour que les autres joueurs rejoignent
+    const qrURL = `${window.location.origin}/rejoindre-personnage.html?game-name=${encodeURIComponent(gameName)}`;
+    QRCode.toCanvas(document.getElementById("qrcode"), qrURL, { width: 200 });
+
+    function goBack() {
       window.location.href = `page3.html?game-name=${encodeURIComponent(gameName)}&character=${encodeURIComponent(character)}`;
-    };
+    }
 
-    document.getElementById("btn-suivi").onclick = () => {
+    function goToSuivi() {
       window.location.href = `suivi.html?game-name=${encodeURIComponent(gameName)}`;
-    };
+    }
+
+    // Affiche la liste des joueurs connectés
+    function actualiserListeJoueurs() {
+      const joueurs = JSON.parse(localStorage.getItem(key)) || [];
+      const list = document.getElementById("player-list");
+      list.innerHTML = "";
+      joueurs.forEach(j => {
+        const li = document.createElement("li");
+        li.textContent = j.personnage;
+        list.appendChild(li);
+      });
+    }
+
+    actualiserListeJoueurs();
+    setInterval(actualiserListeJoueurs, 3000);
   </script>
 
 </body>
