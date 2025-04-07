@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Créer un scénario</title>
+
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
 
-  <!-- 🔧 Ajout PWA -->
+  <!-- Manifest + Icône -->
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="img/logo.png">
 
@@ -22,7 +24,7 @@
     img.logo {
       display: block;
       margin: 0 auto 1rem auto;
-      max-width: 350px; /* Agrandissement du logo */
+      max-width: 350px;
     }
 
     h1 {
@@ -95,6 +97,13 @@
 
       window.location.href = `page2.html?game-name=${encodeURIComponent(gameName)}`;
     });
+
+    // 🔧 Enregistrement du service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('✅ Service Worker enregistré', reg))
+        .catch(err => console.error('❌ Erreur Service Worker :', err));
+    }
   </script>
 
 </body>
