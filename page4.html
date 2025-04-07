@@ -49,27 +49,6 @@
     button:hover {
       background-color: #e02a3b;
     }
-
-    h2 {
-      font-size: 1.3rem;
-      color: #C9A227;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    li {
-      background-color: #2E2E2E;
-      margin: 0.4rem auto;
-      padding: 0.6rem 1rem;
-      border-left: 4px solid #D41427;
-      width: fit-content;
-      border-radius: 4px;
-    }
   </style>
 </head>
 <body>
@@ -82,9 +61,6 @@
     <button onclick="goToSuivi()">Voir les joueurs connectés</button>
   </div>
 
-  <h2>Joueurs connectés :</h2>
-  <ul id="player-list"></ul>
-
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
@@ -93,7 +69,6 @@
     const role = params.get("role");
     const mobile = params.get("mobile");
 
-    // Enregistre le joueur 1 dans la partie
     const joueur = {
       personnage: character,
       role: role,
@@ -108,9 +83,14 @@
       localStorage.setItem(key, JSON.stringify(joueurs));
     }
 
-    // Génère le QR code pour que les autres joueurs rejoignent
     const qrURL = `${window.location.origin}/rejoindre-personnage.html?game-name=${encodeURIComponent(gameName)}`;
-    QRCode.toCanvas(document.getElementById("qrcode"), qrURL, { width: 200 });
+    QRCode.toCanvas(qrURL, { width: 200 }, function (err, canvas) {
+      if (err) {
+        console.error("Erreur QR code :", err);
+        return;
+      }
+      document.getElementById("qrcode").appendChild(canvas);
+    });
 
     function goBack() {
       window.location.href = `page3.html?game-name=${encodeURIComponent(gameName)}&character=${encodeURIComponent(character)}`;
@@ -119,21 +99,6 @@
     function goToSuivi() {
       window.location.href = `suivi.html?game-name=${encodeURIComponent(gameName)}`;
     }
-
-    // Affiche la liste des joueurs connectés
-    function actualiserListeJoueurs() {
-      const joueurs = JSON.parse(localStorage.getItem(key)) || [];
-      const list = document.getElementById("player-list");
-      list.innerHTML = "";
-      joueurs.forEach(j => {
-        const li = document.createElement("li");
-        li.textContent = j.personnage;
-        list.appendChild(li);
-      });
-    }
-
-    actualiserListeJoueurs();
-    setInterval(actualiserListeJoueurs, 3000);
   </script>
 
 </body>

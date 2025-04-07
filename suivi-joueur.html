@@ -6,26 +6,16 @@
   <title>En attente de lancement</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
 
-  <!-- Préchargement des personnages + logo -->
+  <!-- Préchargement -->
   <link rel="preload" as="image" href="img/logo.png">
-  <link rel="preload" as="image" href="img/agent-securite.png">
-  <link rel="preload" as="image" href="img/assistante-production.png">
-  <link rel="preload" as="image" href="img/avocate-stars.png">
-  <link rel="preload" as="image" href="img/chroniqueuse-mondaine.png">
-  <link rel="preload" as="image" href="img/figurante.png">
-  <link rel="preload" as="image" href="img/maquilleuse-de-stars.png">
-  <link rel="preload" as="image" href="img/paparazzi.png">
-  <link rel="preload" as="image" href="img/producteur.png">
-  <link rel="preload" as="image" href="img/realisateur.png">
-  <link rel="preload" as="image" href="img/scenariste.png">
 
   <style>
     body {
       background-color: #1C1C1C;
       color: #F4F4F4;
       font-family: 'Inter', sans-serif;
-      padding: 2rem;
       text-align: center;
+      padding: 2rem;
     }
 
     h1 {
@@ -35,73 +25,24 @@
       margin-bottom: 1rem;
     }
 
-    h2 {
-      font-size: 1.2rem;
-      color: white;
-      margin-bottom: 1.5rem;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin-bottom: 2rem;
-    }
-
-    li {
-      background-color: #2E2E2E;
-      margin: 0.5rem auto;
-      padding: 0.8rem 1.2rem;
-      border-left: 5px solid #D41427;
-      width: fit-content;
-      border-radius: 4px;
-    }
-
     .message {
       font-style: italic;
-      font-size: 1rem;
+      font-size: 1.1rem;
+      margin-top: 2rem;
       color: #F4F4F4;
-      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
 
   <h1>🎬 Scénario en préparation</h1>
-  <h2 id="game-name-display"></h2>
-
-  <div id="player-count"></div>
-  <ul id="player-list"></ul>
-
-  <p class="message">🎬 <em>Patientez... Le rideau se lèvera quand le joueur qui a généré le Qr code lancera la partie.</em></p>
+  <p class="message">🎬 <em>Patientez... Le rideau se lèvera quand le joueur qui a généré le QR code lancera la partie.</em></p>
 
   <script>
     const gameName = localStorage.getItem("nom_partie");
-    const key = `joueurs_${gameName}`;
     const cleLancement = `lancement_partie_${gameName}`;
 
-    document.getElementById("game-name-display").textContent = `Partie : ${gameName}`;
-
-    function actualiserListeJoueurs() {
-      const joueurs = JSON.parse(localStorage.getItem(key)) || [];
-
-      const texteJoueurs = joueurs.length === 1
-        ? "1 joueur connecté :"
-        : `${joueurs.length} joueurs connectés :`;
-      document.getElementById("player-count").textContent = texteJoueurs;
-
-      const list = document.getElementById("player-list");
-      list.innerHTML = "";
-      joueurs.forEach(j => {
-        const li = document.createElement("li");
-        li.textContent = j.personnage;
-        list.appendChild(li);
-      });
-    }
-
-    actualiserListeJoueurs();
-    setInterval(actualiserListeJoueurs, 3000);
-
-    // Synchronisation du lancement de la partie
+    // Redirection automatique au lancement
     setInterval(() => {
       if (localStorage.getItem(cleLancement) === "true") {
         window.location.href = "debut.html";
