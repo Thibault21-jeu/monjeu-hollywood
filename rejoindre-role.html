@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Choix du rôle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1C1C1C;
+      color: #F4F4F4;
+      font-family: 'Inter', sans-serif;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #C9A227;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      font-style: italic;
+      font-size: 1.2rem;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .partie {
+      color: #D41427;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .personnage {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .images {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .images img {
+      width: 150px;
+      border: 3px solid transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border 0.3s ease;
+    }
+
+    .images img.selected {
+      border-color: #D41427;
+    }
+
+    .mobiles {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .mobiles button {
+      background-color: #D41427;
+      border: none;
+      color: white;
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .mobiles button:hover {
+      background-color: #e02a3b;
+    }
+  </style>
+</head>
+<body>
+
+  <p class="partie" id="nom-partie"></p>
+  <h1>🎬 C’est l’heure du casting : de quel côté êtes-vous vraiment ?</h1>
+  <h2 id="phrase-personnage"></h2>
+
+  <div class="images">
+    <img src="img/innocent.png" alt="Innocent" id="innocent" />
+    <img src="img/meurtrier.png" alt="Meurtrier" id="meurtrier" />
+  </div>
+
+  <div class="mobiles" id="mobiles">
+    <button data-mobile="Vengeance personnelle">Vengeance personnelle</button>
+    <button data-mobile="Avidité">Avidité</button>
+    <button data-mobile="Passion & Jalousie">Passion & Jalousie</button>
+    <button data-mobile="Protection d’un secret">Protection d’un secret</button>
+  </div>
+
+  <script>
+    const gameName = localStorage.getItem("nom_partie");
+    const character = localStorage.getItem("personnage");
+
+    document.getElementById("nom-partie").textContent = `Partie : ${gameName}`;
+    document.getElementById("phrase-personnage").textContent = `Je suis ${character}`;
+
+    const innocentImg = document.getElementById("innocent");
+    const meurtrierImg = document.getElementById("meurtrier");
+    const mobilesDiv = document.getElementById("mobiles");
+
+    let role = "";
+    let mobile = "";
+
+    function goToNext() {
+      localStorage.setItem("role", role);
+      localStorage.setItem("mobile", mobile);
+      window.location.href = `rejoindre-final.html`;
+    }
+
+    innocentImg.addEventListener("click", () => {
+      role = "innocent";
+      mobile = "";
+      innocentImg.classList.add("selected");
+      meurtrierImg.classList.remove("selected");
+      mobilesDiv.style.display = "none";
+      setTimeout(goToNext, 500);
+    });
+
+    meurtrierImg.addEventListener("click", () => {
+      role = "meurtrier";
+      innocentImg.classList.remove("selected");
+      meurtrierImg.classList.add("selected");
+      mobilesDiv.style.display = "flex";
+    });
+
+    document.querySelectorAll("#mobiles button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        mobile = btn.dataset.mobile;
+        goToNext();
+      });
+    });
+  </script>
+
+</body>
+</html>

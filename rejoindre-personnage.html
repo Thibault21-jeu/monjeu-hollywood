@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Choix du personnage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1C1C1C;
+      color: #F4F4F4;
+      font-family: 'Inter', sans-serif;
+      padding: 2rem;
+      position: relative;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #C9A227;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .partie {
+      color: #D41427;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+      text-align: left;
+    }
+
+    .soustitre {
+      font-style: italic;
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .card {
+      flex: 0 0 200px;
+      height: 300px;
+      border: 4px solid #D41427;
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: #2E2E2E;
+      cursor: pointer;
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .btn-retour {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background-color: #D41427;
+      color: white;
+      border: none;
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-retour:hover {
+      background-color: #e02a3b;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="btn-retour" onclick="window.location.href='rejoindre.html'">← Retour</button>
+
+  <p class="partie" id="nom-partie"></p>
+  <h1>Distribution des rôles :</h1>
+  <p class="soustitre">Je suis...</p>
+
+  <div class="grid" id="cards-container">
+    <div class="card" data-character="L'Agent de Sécurité"><img src="img/agent-securite.png" alt=""></div>
+    <div class="card" data-character="L'Assistante de Production"><img src="img/assistante-production.png" alt=""></div>
+    <div class="card" data-character="L'Avocate des Stars"><img src="img/avocate-stars.png" alt=""></div>
+    <div class="card" data-character="La Chroniqueuse Mondaine"><img src="img/chroniqueuse-mondaine.png" alt=""></div>
+    <div class="card" data-character="La Figurante"><img src="img/figurante.png" alt=""></div>
+    <div class="card" data-character="La Maquilleuse de Stars"><img src="img/maquilleuse-de-stars.png" alt=""></div>
+    <div class="card" data-character="Le Paparazzi"><img src="img/paparazzi.png" alt=""></div>
+    <div class="card" data-character="Le Producteur"><img src="img/producteur.png" alt=""></div>
+    <div class="card" data-character="Le Réalisateur"><img src="img/realisateur.png" alt=""></div>
+    <div class="card" data-character="Le Scénariste"><img src="img/scenariste.png" alt=""></div>
+  </div>
+
+  <script>
+    const gameName = localStorage.getItem("nom_partie");
+    document.getElementById("nom-partie").textContent = `Partie : ${gameName}`;
+
+    const cards = document.querySelectorAll(".card");
+    cards.forEach(card => {
+      card.addEventListener("click", () => {
+        const character = card.getAttribute("data-character");
+        localStorage.setItem("personnage", character);
+        window.location.href = `rejoindre-role.html`;
+      });
+    });
+  </script>
+
+</body>
+</html>

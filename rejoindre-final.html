@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Préparation du tournage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1C1C1C;
+      color: #F4F4F4;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: #C9A227;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      font-style: italic;
+      color: #F4F4F4;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎬 Préparation du tournage...</h1>
+  <p>Merci d’avoir rejoint la distribution.<br>
+  Vous serez redirigé dans un instant vers le plateau.</p>
+
+  <script>
+    const gameName = localStorage.getItem("nom_partie");
+    const personnage = localStorage.getItem("personnage");
+    const role = localStorage.getItem("role");
+    const mobile = localStorage.getItem("mobile") || "";
+
+    const cleJoueurs = `joueurs_${gameName}`;
+    const joueurs = JSON.parse(localStorage.getItem(cleJoueurs) || "[]");
+
+    const joueurDejaInscrit = joueurs.find(j => j.personnage === personnage);
+
+    if (!joueurDejaInscrit) {
+      joueurs.push({ personnage, role, mobile });
+      localStorage.setItem(cleJoueurs, JSON.stringify(joueurs));
+    }
+
+    // Redirection automatique
+    setTimeout(() => {
+      window.location.href = "suivi.html";
+    }, 1500);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rejoindre un scénario</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1C1C1C;
+      color: #F4F4F4;
+      font-family: 'Inter', sans-serif;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    img.logo {
+      display: block;
+      margin: 0 auto 1.5rem auto;
+      max-width: 350px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      color: #C9A227;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1rem;
+      font-style: italic;
+      color: #F4F4F4;
+      margin-bottom: 2rem;
+    }
+
+    .scenario {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #D41427;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      padding: 0.8rem 1.2rem;
+      background-color: #D41427;
+      color: white;
+      border: none;
+      border-radius: 0.4rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e02a3b;
+    }
+  </style>
+</head>
+<body>
+
+  <img src="img/logo.png" alt="Logo du jeu" class="logo" />
+
+  <h1>🎬 Rejoindre le scénario</h1>
+  <p>Vous entrez dans l’histoire en cours…</p>
+  <div class="scenario" id="scenario-name">Scénario : </div>
+
+  <button id="btn-choisir-personnage">Choisir mon personnage</button>
+
+  <script>
+    // Récupération du nom de la partie dans l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameName = urlParams.get("game-name");
+
+    if (!gameName) {
+      document.getElementById("scenario-name").textContent = "Erreur : aucun scénario trouvé.";
+      document.getElementById("btn-choisir-personnage").disabled = true;
+    } else {
+      document.getElementById("scenario-name").textContent = "🎭 Scénario : " + gameName;
+      // Stocke le nom dans le localStorage
+      localStorage.setItem("nom_partie", gameName);
+    }
+
+    // Redirection vers la page de choix du personnage
+    document.getElementById("btn-choisir-personnage").addEventListener("click", () => {
+      window.location.href = "rejoindre-personnage.html?game-name=" + encodeURIComponent(gameName);
+    });
+  </script>
+
+</body>
+</html>
