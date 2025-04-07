@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Créer un scénario</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+
+  <!-- 🔧 Ajout PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="img/logo.png">
+
   <style>
     body {
       background-color: #1C1C1C;
@@ -78,19 +83,16 @@
       e.preventDefault();
       const gameName = document.getElementById("game-name").value.trim();
 
-      // Vérifie si un nom identique est déjà utilisé
       const partiesEnCours = JSON.parse(localStorage.getItem("parties_en_cours") || "[]");
       if (partiesEnCours.includes(gameName)) {
         alert("Ce nom de scénario est déjà utilisé. Veuillez en choisir un autre.");
         return;
       }
 
-      // Enregistrement du nom de partie
       localStorage.setItem("createur_partie", gameName);
       partiesEnCours.push(gameName);
       localStorage.setItem("parties_en_cours", JSON.stringify(partiesEnCours));
 
-      // Redirection
       window.location.href = `page2.html?game-name=${encodeURIComponent(gameName)}`;
     });
   </script>
