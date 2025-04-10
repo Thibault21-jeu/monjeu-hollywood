@@ -61,7 +61,7 @@
 
   <p>Entrez le code à 6 chiffres donné par le créateur de la partie :</p>
 
-  <!-- AUCUN maxlength ici -->
+  <!-- ⚠️ aucun maxlength ici -->
   <input type="text" id="codePartie" placeholder="ex : 123456" />
 
   <div>
@@ -72,25 +72,21 @@
     function rejoindrePartie() {
       const code = document.getElementById("codePartie").value.trim();
 
-      // cas spécial code admin à 8 chiffres
       if (code === "21051999") {
         window.location.href = "admin.html";
         return;
       }
 
-      // Bloque explicitement le code interdit
       if (code === "210519") {
         alert("Ce code n'est pas autorisé. Veuillez réessayer avec un autre code.");
         return;
       }
 
-      // Vérifie que tous les autres codes sont exactement à 6 chiffres
       if (!code.match(/^\d{6}$/)) {
         alert("Veuillez entrer un code à 6 chiffres valide.");
         return;
       }
 
-      // Vérification de l’existence de la partie
       const parties = JSON.parse(localStorage.getItem("parties") || "{}");
       if (!parties[code]) {
         alert("Cette partie n'existe pas.");
