@@ -56,6 +56,9 @@
   </div>
 
   <script>
+    // Nettoyage de l'entrée temporaire
+    localStorage.removeItem("joueur-en-cours");
+
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     const partieCle = `joueurs-${code}`;

@@ -1,10 +1,12 @@
 {
-  "name": "HollyBlood - Secrets Obscurs",
-  "short_name": "Hollybood",
+  "name": "HollyBlood",
+  "short_name": "HollyBlood",
   "start_url": "index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#1C1C1C",
   "theme_color": "#C9A227",
+  "description": "Un jeu de société immersif inspiré du cinéma hollywoodien.",
   "icons": [
     {
       "src": "img/logo.png",

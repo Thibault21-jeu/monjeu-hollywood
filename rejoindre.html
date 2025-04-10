@@ -1,77 +1,96 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HollyBlood - Rejoindre une partie</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="img/logo.png" />
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
   <style>
-    input[type="text"] {
+    body {
+      background-color: #1C1C1C;
+      color: #F4F4F4;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      color: #C9A227;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    input {
       padding: 1rem;
-      font-size: 1.2rem;
+      border-radius: 6px;
       border: none;
-      border-radius: 8px;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
       width: 200px;
       text-align: center;
     }
 
-    .form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      align-items: center;
-      margin-top: 2rem;
+    .btn-principal {
+      background-color: #D41427;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 1rem;
+      font-size: 1.1rem;
+      cursor: pointer;
     }
 
-    .erreur {
-      color: #ff6666;
-      font-style: italic;
-      margin-top: 1rem;
+    .btn-principal:hover {
+      background-color: #e02a3b;
+    }
+
+    .logo {
+      width: 180px;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
 
-  <button class="btn-retour" onclick="window.location.href='index.html'">⬅ Retour</button>
-
   <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
   <h1>🎟️ Rejoindre une partie</h1>
 
-  <div class="form">
-    <label for="code">Entrez le code de la partie</label>
-    <input type="text" id="code" maxlength="6" placeholder="123456" />
-    <button class="btn-principal" onclick="verifierCode()">Rejoindre la partie</button>
-    <div id="message" class="erreur"></div>
+  <p>Entrez le code à 6 chiffres donné par le créateur de la partie :</p>
+
+  <input type="text" id="codePartie" maxlength="6" placeholder="ex : 123456" />
+
+  <div>
+    <button class="btn-principal" onclick="rejoindrePartie()">Rejoindre</button>
   </div>
 
   <script>
-    function verifierCode() {
-      const code = document.getElementById("code").value.trim();
+    function rejoindrePartie() {
+      const code = document.getElementById("codePartie").value.trim();
+      if (!code.match(/^\d{6}$/)) {
+        alert("Veuillez entrer un code à 6 chiffres.");
+        return;
+      }
+
+      if (code === "21051999") {
+        window.location.href = "admin.html";
+        return;
+      }
+
       const parties = JSON.parse(localStorage.getItem("parties") || "{}");
-      const message = document.getElementById("message");
-
-      if (!/^\d{6}$/.test(code)) {
-        message.textContent = "Le code doit contenir 6 chiffres.";
-        return;
-      }
-
       if (!parties[code]) {
-        message.textContent = "Ce code ne correspond à aucune partie.";
+        alert("Cette partie n'existe pas.");
         return;
       }
 
-      // Redirection vers choix du personnage
       window.location.href = `page2-joueur2.html?code=${code}`;
     }
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ SW actif'))
-        .catch(err => console.error('❌ SW KO', err));
+      navigator.serviceWorker.register('service-worker.js');
     }
   </script>
 

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HollyBlood - Admin</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background-color: #1C1C1C;
+      color: #F4F4F4;
+      font-family: 'Inter', sans-serif;
+      padding: 2rem;
+    }
+
+    h1 {
+      color: #C9A227;
+      margin-bottom: 1rem;
+    }
+
+    .partie {
+      border: 1px solid #444;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      background-color: #2A2A2A;
+    }
+
+    .joueur {
+      padding: 0.4rem 0;
+      border-bottom: 1px solid #333;
+    }
+
+    .erreur {
+      color: #FF6B6B;
+      font-weight: bold;
+    }
+
+    .boutons {
+      margin-top: 1rem;
+    }
+
+    .btn {
+      background-color: #D41427;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      margin-right: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn:hover {
+      background-color: #e02a3b;
+    }
+
+    .infos {
+      margin: 1rem 0;
+      font-style: italic;
+      color: #aaa;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🎬 Panneau Administrateur</h1>
+
+  <div id="statsGlobales" class="infos"></div>
+  <div id="contenuAdmin"></div>
+
+  <button class="btn" onclick="toutEffacer()">🧨 Réinitialiser tout</button>
+  <button class="btn" onclick="nettoyerInactives()">🧹 Nettoyer les parties inactives</button>
+
+  <script>
+    const nomsComplets = {
+      "agent-securite": "L'Agent de Sécurité",
+      "assistante-production": "L’Assistante de Production",
+      "avocate-stars": "L’Avocate des Stars",
+      "chroniqueuse-mondaine": "La Chroniqueuse Mondaine",
+      "figurante": "La Figurante",
+      "maquilleuse-de-stars": "La Maquilleuse de Stars",
+      "paparazzi": "Le Paparazzi",
+      "producteur": "Le Producteur",
+      "realisateur": "Le Réalisateur",
+      "scenariste": "Le Scénariste"
+    };
+
+    const parties = JSON.parse(localStorage.getItem("parties") || "{}");
+    const container = document.getElementById("contenuAdmin");
+    const now = Date.now();
+
+    let totalJoueurs = 0;
+    let totalMeurtriers = 0;
+
+    Object.entries(parties).forEach(([code, scene]) => {
+      const cle = `joueurs-${code}`;
+      const joueurs = JSON.parse(localStorage.getItem(cle) || "[]");
+      totalJoueurs += joueurs.length;
+      totalMeurtriers += joueurs.filter(j => j.role === "meurtrier").length;
+
+      const partieDiv = document.createElement("div");
+      partieDiv.className = "partie";
+
+      const dateCreation = parseInt(code) * 10;
+      const diff = Math.floor((now - dateCreation) / 60000); // minutes
+
+      const erreurs = [];
+      const meurtriers = joueurs.filter(j => j.role === "meurtrier");
+      if (meurtriers.length > 1) erreurs.push("⚠️ Plusieurs meurtriers");
+      if (joueurs.length < 3) erreurs.push("⚠️ Moins de 3 joueurs");
+
+      partieDiv.innerHTML = `
+        <h3>🎬 Partie ${code} – <em>${scene}</em></h3>
+        <div class="infos">⏱️ Créée il y a ${diff} min – ${joueurs.length} joueur(s)</div>
+        ${erreurs.length > 0 ? `<div class="erreur">${erreurs.join(" | ")}</div>` : ''}
+        <div id="joueurs-${code}">
+          ${joueurs.map((j, i) => `
+            <div class="joueur">
+              🎭 ${nomsComplets[j.perso] || j.perso} – ${j.role.toUpperCase()} ${j.mobile ? `(Mobile : ${j.mobile})` : ''}
+              <button class="btn" onclick="supprimerJoueur('${cle}', ${i})">❌ Supprimer</button>
+            </div>
+          `).join("")}
+        </div>
+        <div class="boutons">
+          <button class="btn" onclick="ajouterTest('${cle}')">🧪 Ajouter un joueur test</button>
+          <button class="btn" onclick="cloturer('${cle}', '${code}')">🗑️ Clôturer la partie</button>
+          <button class="btn" onclick="forcerDebut('${code}')">🚀 Forcer le démarrage</button>
+        </div>
+      `;
+
+      container.appendChild(partieDiv);
+    });
+
+    document.getElementById("statsGlobales").innerText =
+      `📊 ${totalJoueurs} joueur(s) total – ${totalMeurtriers} meurtrier(s)`;
+
+    function supprimerJoueur(cle, index) {
+      const joueurs = JSON.parse(localStorage.getItem(cle));
+      joueurs.splice(index, 1);
+      localStorage.setItem(cle, JSON.stringify(joueurs));
+      location.reload();
+    }
+
+    function cloturer(cle, code) {
+      localStorage.removeItem(cle);
+      const parties = JSON.parse(localStorage.getItem("parties") || "{}");
+      delete parties[code];
+      localStorage.setItem("parties", JSON.stringify(parties));
+      location.reload();
+    }
+
+    function ajouterTest(cle) {
+      const testPerso = "figurante";
+      const test = { perso: testPerso, role: "innocent" };
+      const joueurs = JSON.parse(localStorage.getItem(cle) || "[]");
+      joueurs.push(test);
+      localStorage.setItem(cle, JSON.stringify(joueurs));
+      location.reload();
+    }
+
+    function forcerDebut(code) {
+      alert(`🚀 Lancement de la partie ${code} ! (à implémenter selon tes règles)`);
+    }
+
+    function toutEffacer() {
+      if (confirm("Confirmer la suppression TOTALE de toutes les parties ?")) {
+        Object.keys(localStorage).forEach(k => {
+          if (k.startsWith("joueurs-") || k === "parties") {
+            localStorage.removeItem(k);
+          }
+        });
+        location.reload();
+      }
+    }
+
+    function nettoyerInactives() {
+      const seuil = Date.now() - 2 * 60 * 60 * 1000; // 2h
+      const parties = JSON.parse(localStorage.getItem("parties") || "{}");
+      let modif = false;
+      for (const code in parties) {
+        if (parseInt(code) * 10 < seuil) {
+          localStorage.removeItem(`joueurs-${code}`);
+          delete parties[code];
+          modif = true;
+        }
+      }
+      if (modif) {
+        localStorage.setItem("parties", JSON.stringify(parties));
+        location.reload();
+      } else {
+        alert("Aucune partie inactive à supprimer.");
+      }
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>

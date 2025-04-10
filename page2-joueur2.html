@@ -38,6 +38,12 @@
     .personnage-btn:hover {
       background-color: #e02a3b;
     }
+
+    .disabled {
+      background-color: #555 !important;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
   </style>
 </head>
 <body>
@@ -72,20 +78,37 @@
 
     const container = document.getElementById("listePersonnages");
 
+    // Personnages déjà pris
+    const joueurs = JSON.parse(localStorage.getItem(`joueurs-${code}`) || "[]");
+    const persosPris = joueurs.map(j => j.perso);
+
+    // Joueur déjà en cours (revient en arrière)
+    const joueurTemp = JSON.parse(localStorage.getItem("joueur-en-cours") || "null");
+    if (joueurTemp && joueurTemp.code === code && joueurTemp.perso) {
+      persosPris.push(joueurTemp.perso);
+    }
+
     personnages.forEach(p => {
       const btn = document.createElement("button");
       btn.className = "personnage-btn";
       btn.innerText = p.nom;
-      btn.onclick = () => {
-        window.location.href = `page3-joueur2.html?code=${code}&perso=${p.id}`;
-      };
+
+      const dejaPris = persosPris.includes(p.id);
+      if (dejaPris) {
+        btn.classList.add("disabled");
+        btn.disabled = true;
+      } else {
+        btn.onclick = () => {
+          localStorage.setItem("joueur-en-cours", JSON.stringify({ code, perso: p.id }));
+          window.location.href = `page3-joueur2.html?code=${code}&perso=${p.id}`;
+        };
+      }
+
       container.appendChild(btn);
     });
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ SW actif'))
-        .catch(err => console.error('❌ SW KO', err));
+      navigator.serviceWorker.register('service-worker.js');
     }
   </script>
 
