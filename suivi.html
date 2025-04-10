@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HollyBlood - Suivi</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="img/logo.png">
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="img/logo.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
 
   <style>
     .joueurs {
@@ -24,47 +24,42 @@
       text-align: left;
     }
 
-    .code {
-      font-size: 1rem;
-      color: #C9A227;
-      margin-top: 1rem;
-    }
-
     .attente {
       font-style: italic;
+      color: #ccc;
+      text-align: center;
       margin-top: 2rem;
-      color: #aaaaaa;
     }
 
-    .btn-commencer {
-      background-color: #D41427;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 1rem 2rem;
-      font-size: 1.1rem;
-      margin-top: 2rem;
-      cursor: pointer;
-    }
-
-    .btn-commencer:hover {
-      background-color: #e02a3b;
+    .code-info {
+      background-color: #1C1C1C;
+      padding: 1rem;
+      font-size: 1.2rem;
+      color: #C9A227;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
   <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
-  <h1>🎬 Suivi de la distribution</h1>
-  <div class="info" id="partieInfo"></div>
+  <h1>🎭 En attente des autres joueurs</h1>
+
+  <div class="code-info" id="affichageCode"></div>
 
   <div class="joueurs" id="listeJoueurs">
     <p>Chargement des joueurs...</p>
   </div>
 
-  <div id="actionZone"></div>
+  <div class="attente">
+    🎬 <em>Patientez... Le rideau se lèvera quand le joueur qui a généré le code lancera la partie.</em>
+  </div>
 
   <script>
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const partieCle = `joueurs-${code}`;
+
     const nomsComplets = {
       "agent-securite": "L'Agent de Sécurité",
       "assistante-production": "L’Assistante de Production",
@@ -78,54 +73,26 @@
       "scenariste": "Le Scénariste"
     };
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-    const createur = urlParams.get("createur") === "1";
-    const perso = urlParams.get("perso");
-    const role = urlParams.get("role");
-    const mobile = urlParams.get("mobile") || null;
+    document.getElementById("affichageCode").innerText = `Code de la partie : ${code}`;
 
-    const partieCle = `joueurs-${code}`;
-    const joueurs = JSON.parse(localStorage.getItem(partieCle) || "[]");
+    function afficherJoueurs() {
+      const joueurs = JSON.parse(localStorage.getItem(partieCle) || "[]");
+      const container = document.getElementById("listeJoueurs");
+      container.innerHTML = "";
 
-    const dejaAjoute = joueurs.some(j => j.perso === perso);
-    if (!dejaAjoute && perso && role) {
-      joueurs.push({ perso, role, mobile });
-      localStorage.setItem(partieCle, JSON.stringify(joueurs));
+      joueurs.forEach(joueur => {
+        const div = document.createElement("div");
+        div.className = "joueur";
+        div.innerText = `🎭 ${nomsComplets[joueur.perso] || joueur.perso}`;
+        container.appendChild(div);
+      });
     }
 
-    const parties = JSON.parse(localStorage.getItem("parties") || "{}");
-    const nom = parties[code] || "Sans nom";
-    document.getElementById("partieInfo").innerText = `🎥 Scène : ${nom} | Code : ${code}`;
-
-    const container = document.getElementById("listeJoueurs");
-    container.innerHTML = "";
-
-    joueurs.forEach(joueur => {
-      const div = document.createElement("div");
-      div.className = "joueur";
-      div.innerText = `🎭 ${nomsComplets[joueur.perso] || joueur.perso}`;
-      container.appendChild(div);
-    });
-
-    const actionZone = document.getElementById("actionZone");
-    if (createur) {
-      const btn = document.createElement("button");
-      btn.className = "btn-commencer";
-      btn.innerText = "🎬 Le casting est complet, la partie commence !";
-      btn.onclick = () => alert("Début de la partie (à connecter)");
-      actionZone.appendChild(btn);
-    } else {
-      const attente = document.createElement("div");
-      attente.className = "attente";
-      attente.innerText = "🎬 Patientez... Le rideau se lèvera quand le joueur qui a généré le code lancera la partie.";
-      actionZone.appendChild(attente);
-    }
+    afficherJoueurs();
+    setInterval(afficherJoueurs, 2000);
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ SW actif'))
-        .catch(err => console.error('❌ SW KO', err));
+      navigator.serviceWorker.register('service-worker.js');
     }
   </script>
 
