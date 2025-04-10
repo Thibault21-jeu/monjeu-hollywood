@@ -61,6 +61,7 @@
 
   <p>Entrez le code à 6 chiffres donné par le créateur de la partie :</p>
 
+  <!-- AUCUN maxlength ici -->
   <input type="text" id="codePartie" placeholder="ex : 123456" />
 
   <div>
@@ -68,40 +69,28 @@
   </div>
 
   <script>
-    const inputCode = document.getElementById("codePartie");
-
-    // Autorise dynamiquement 8 chiffres uniquement pour le code admin (21051999)
-    inputCode.addEventListener('input', function() {
-      const valeur = inputCode.value.trim();
-      if (valeur.startsWith("210519")) {
-        inputCode.maxLength = 8;
-      } else {
-        inputCode.maxLength = 6;
-      }
-
-      if (inputCode.value.length > inputCode.maxLength) {
-        inputCode.value = inputCode.value.slice(0, inputCode.maxLength);
-      }
-    });
-
     function rejoindrePartie() {
-      const code = inputCode.value.trim();
+      const code = document.getElementById("codePartie").value.trim();
 
+      // cas spécial code admin à 8 chiffres
       if (code === "21051999") {
         window.location.href = "admin.html";
         return;
       }
 
-      if (!code.match(/^\d{6}$/)) {
-        alert("Veuillez entrer un code à 6 chiffres.");
-        return;
-      }
-
+      // Bloque explicitement le code interdit
       if (code === "210519") {
         alert("Ce code n'est pas autorisé. Veuillez réessayer avec un autre code.");
         return;
       }
 
+      // Vérifie que tous les autres codes sont exactement à 6 chiffres
+      if (!code.match(/^\d{6}$/)) {
+        alert("Veuillez entrer un code à 6 chiffres valide.");
+        return;
+      }
+
+      // Vérification de l’existence de la partie
       const parties = JSON.parse(localStorage.getItem("parties") || "{}");
       if (!parties[code]) {
         alert("Cette partie n'existe pas.");
