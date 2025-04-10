@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HollyBlood - Sélection du personnage</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="img/logo.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
+
+  <style>
+    .personnages {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      max-width: 400px;
+      margin: 2rem auto;
+    }
+
+    .personnage-btn {
+      background-color: #D41427;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .personnage-btn:hover {
+      background-color: #e02a3b;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="btn-retour" onclick="window.location.href='rejoindre.html'">⬅ Retour</button>
+
+  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
+  <h1>🎭 Distribution des rôles</h1>
+
+  <p style="font-style: italic; color: #ccc; margin-top: 1rem;">
+    🎴 Indiquez la carte personnage que vous avez tirée...
+  </p>
+
+  <div class="personnages" id="listePersonnages"></div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+
+    const personnages = [
+      { id: "agent-securite", nom: "L'Agent de Sécurité" },
+      { id: "assistante-production", nom: "L’Assistante de Production" },
+      { id: "avocate-stars", nom: "L’Avocate des Stars" },
+      { id: "chroniqueuse-mondaine", nom: "La Chroniqueuse Mondaine" },
+      { id: "figurante", nom: "La Figurante" },
+      { id: "maquilleuse-de-stars", nom: "La Maquilleuse de Stars" },
+      { id: "paparazzi", nom: "Le Paparazzi" },
+      { id: "producteur", nom: "Le Producteur" },
+      { id: "realisateur", nom: "Le Réalisateur" },
+      { id: "scenariste", nom: "Le Scénariste" }
+    ];
+
+    const container = document.getElementById("listePersonnages");
+
+    personnages.forEach(p => {
+      const btn = document.createElement("button");
+      btn.className = "personnage-btn";
+      btn.innerText = p.nom;
+      btn.onclick = () => {
+        window.location.href = `page3-joueur2.html?code=${code}&perso=${p.id}`;
+      };
+      container.appendChild(btn);
+    });
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('✅ SW actif'))
+        .catch(err => console.error('❌ SW KO', err));
+    }
+  </script>
+
+</body>
+</html>

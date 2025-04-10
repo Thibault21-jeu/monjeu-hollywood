@@ -1,89 +1,78 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rejoindre un scénario</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HollyBlood - Rejoindre une partie</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="img/logo.png" />
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+
   <style>
-    body {
-      background-color: #1C1C1C;
-      color: #F4F4F4;
-      font-family: 'Inter', sans-serif;
-      padding: 2rem;
+    input[type="text"] {
+      padding: 1rem;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 8px;
+      width: 200px;
       text-align: center;
     }
 
-    img.logo {
-      display: block;
-      margin: 0 auto 1.5rem auto;
-      max-width: 350px;
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 2rem;
     }
 
-    h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
-      color: #C9A227;
-      margin-bottom: 1rem;
-    }
-
-    p {
-      font-size: 1rem;
+    .erreur {
+      color: #ff6666;
       font-style: italic;
-      color: #F4F4F4;
-      margin-bottom: 2rem;
-    }
-
-    .scenario {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #D41427;
-      margin-bottom: 2rem;
-    }
-
-    button {
-      padding: 0.8rem 1.2rem;
-      background-color: #D41427;
-      color: white;
-      border: none;
-      border-radius: 0.4rem;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #e02a3b;
+      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
 
-  <img src="img/logo.png" alt="Logo du jeu" class="logo" />
+  <button class="btn-retour" onclick="window.location.href='index.html'">⬅ Retour</button>
 
-  <h1>🎬 Rejoindre le scénario</h1>
-  <p>Vous entrez dans l’histoire en cours…</p>
-  <div class="scenario" id="scenario-name">Scénario : </div>
+  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
+  <h1>🎟️ Rejoindre une partie</h1>
 
-  <button id="btn-choisir-personnage">Choisir mon personnage</button>
+  <div class="form">
+    <label for="code">Entrez le code de la partie</label>
+    <input type="text" id="code" maxlength="6" placeholder="123456" />
+    <button class="btn-principal" onclick="verifierCode()">Rejoindre la partie</button>
+    <div id="message" class="erreur"></div>
+  </div>
 
   <script>
-    // Récupération du nom de la partie dans l'URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const gameName = urlParams.get("game-name");
+    function verifierCode() {
+      const code = document.getElementById("code").value.trim();
+      const parties = JSON.parse(localStorage.getItem("parties") || "{}");
+      const message = document.getElementById("message");
 
-    if (!gameName) {
-      document.getElementById("scenario-name").textContent = "Erreur : aucun scénario trouvé.";
-      document.getElementById("btn-choisir-personnage").disabled = true;
-    } else {
-      document.getElementById("scenario-name").textContent = "🎭 Scénario : " + gameName;
-      // Stocke le nom dans le localStorage
-      localStorage.setItem("nom_partie", gameName);
+      if (!/^\d{6}$/.test(code)) {
+        message.textContent = "Le code doit contenir 6 chiffres.";
+        return;
+      }
+
+      if (!parties[code]) {
+        message.textContent = "Ce code ne correspond à aucune partie.";
+        return;
+      }
+
+      // Redirection vers choix du personnage
+      window.location.href = `page2-joueur2.html?code=${code}`;
     }
 
-    // Redirection vers la page de choix du personnage
-    document.getElementById("btn-choisir-personnage").addEventListener("click", () => {
-      window.location.href = "rejoindre-personnage.html?game-name=" + encodeURIComponent(gameName);
-    });
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('✅ SW actif'))
+        .catch(err => console.error('❌ SW KO', err));
+    }
   </script>
 
 </body>

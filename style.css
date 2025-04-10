@@ -1,0 +1,148 @@
+/* ---- Structure générale ---- */
+body {
+  background-color: #1C1C1C;
+  color: #F4F4F4;
+  font-family: 'Inter', sans-serif;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+}
+
+/* ---- Titres ---- */
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  color: #C9A227;
+  margin-bottom: 1rem;
+}
+
+/* ---- Logo ---- */
+img.logo {
+  width: 200px;
+  margin-bottom: 1rem;
+}
+
+/* ---- Boutons rouges principaux ---- */
+button.btn-principal {
+  background-color: #D41427;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+button.btn-principal:hover {
+  background-color: #e02a3b;
+}
+
+/* ---- Bouton retour (en haut à gauche) ---- */
+button.btn-retour {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background-color: #D41427;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+button.btn-retour:hover {
+  background-color: #e02a3b;
+}
+
+/* ---- Bouton doré pour "🔁 Générer un nouveau nom" ---- */
+button.btn-doree {
+  background-color: transparent;
+  border: 2px solid #C9A227;
+  color: #C9A227;
+  border-radius: 8px;
+  padding: 0.8rem 1.4rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button.btn-doree:hover {
+  background-color: #C9A227;
+  color: #1C1C1C;
+}
+
+/* ---- Encadré nom de la scène ---- */
+#nomScenario {
+  font-style: italic;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+/* ---- Conteneur cartes personnages ---- */
+.personnages {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.carte {
+  background-color: #2A2A2A;
+  border: 2px solid #D41427;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.carte:hover {
+  transform: scale(1.05);
+}
+
+.carte img {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+}
+
+.carte span {
+  display: block;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+/* ---- Informations sous le titre ---- */
+.info {
+  color: #D41427;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.perso {
+  font-size: 1.2rem;
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+/* ---- Conteneur joueurs connectés ---- */
+.joueurs {
+  margin: 2rem auto;
+  max-width: 400px;
+  background-color: #2A2A2A;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.joueur {
+  border-bottom: 1px solid #444;
+  padding: 0.5rem 0;
+}
+
+/* ---- Texte d’attente immersif ---- */
+.attente {
+  font-style: italic;
+  margin-top: 2rem;
+  color: #aaaaaa;
+}

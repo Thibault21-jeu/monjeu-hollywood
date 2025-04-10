@@ -3,108 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Créer un scénario</title>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
-
-  <!-- Manifest + Icône -->
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="img/logo.png">
+  <title>HollyBlood</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="img/logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
 
   <style>
     body {
       background-color: #1C1C1C;
       color: #F4F4F4;
       font-family: 'Inter', sans-serif;
-      padding: 2rem;
       text-align: center;
+      padding: 3rem 2rem;
     }
 
     img.logo {
-      display: block;
-      margin: 0 auto 1rem auto;
-      max-width: 350px;
+      width: 220px;
+      margin-bottom: 2rem;
     }
 
     h1 {
       font-family: 'Playfair Display', serif;
       font-size: 2.2rem;
       color: #C9A227;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
-    p.intro {
-      font-size: 1rem;
+    p {
       font-style: italic;
       margin-bottom: 2rem;
-      color: #F4F4F4;
+      color: #CCCCCC;
     }
 
-    input, button {
-      width: 100%;
-      padding: 0.6rem;
-      margin-top: 0.5rem;
-      background-color: #2E2E2E;
-      color: #F4F4F4;
-      border: 1px solid #D41427;
-      border-radius: 0.4rem;
-      font-size: 1rem;
+    .btns {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      max-width: 300px;
+      margin: 0 auto;
     }
 
-    button {
-      margin-top: 2rem;
+    .btns button {
       background-color: #D41427;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 1.1rem;
       cursor: pointer;
     }
 
-    button:hover {
+    .btns button:hover {
       background-color: #e02a3b;
     }
   </style>
 </head>
 <body>
 
-  <img src="img/logo.png" alt="Logo du jeu" class="logo" />
+  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
+  <h1>Bienvenue dans HollyBlood</h1>
+  <p>🎥 Un crime sur fond de projecteurs... Saurez-vous élucider le mystère&nbsp;?</p>
 
-  <p class="intro">
-    🎬 Il est temps d’entrer dans l’histoire…<br>
-    Chaque joueur tire une carte Personnage, puis pioche une carte Suspect.<br>
-    Pour commencer, entrez le nom de votre scénario.
-  </p>
-
-  <h1>Créer un scénario</h1>
-
-  <form id="game-form">
-    <input type="text" id="game-name" name="game-name" placeholder="Nom du scénario" required />
-    <button type="submit">Créer une partie</button>
-  </form>
+  <div class="btns">
+    <button onclick="window.location.href='creer.html'">🎬 Créer une partie</button>
+    <button onclick="window.location.href='rejoindre.html'">🎟️ Rejoindre une partie</button>
+  </div>
 
   <script>
-    document.getElementById("game-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const gameName = document.getElementById("game-name").value.trim();
-
-      const partiesEnCours = JSON.parse(localStorage.getItem("parties_en_cours") || "[]");
-      if (partiesEnCours.includes(gameName)) {
-        alert("Ce nom de scénario est déjà utilisé. Veuillez en choisir un autre.");
-        return;
-      }
-
-      localStorage.setItem("createur_partie", gameName);
-      partiesEnCours.push(gameName);
-      localStorage.setItem("parties_en_cours", JSON.stringify(partiesEnCours));
-
-      window.location.href = `page2.html?game-name=${encodeURIComponent(gameName)}`;
-    });
-
-    // 🔧 Enregistrement du service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ Service Worker enregistré', reg))
-        .catch(err => console.error('❌ Erreur Service Worker :', err));
+        .then(reg => console.log('✅ SW enregistré'))
+        .catch(err => console.error('❌ SW erreur', err));
     }
   </script>
-
 </body>
 </html>

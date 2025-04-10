@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HollyBlood - Choix du mobile</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="img/logo.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
+
+  <style>
+    .mobiles {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 350px;
+      margin: 2rem auto;
+    }
+
+    .info-choix {
+      font-style: italic;
+      color: #ccc;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="btn-retour" onclick="history.back()">⬅ Retour</button>
+
+  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
+  <h1>💀 Votre mobile...</h1>
+
+  <div class="perso" id="persoNom"></div>
+  <p class="info-choix">🧠 Choisissez la raison qui vous a poussé à commettre ce crime...</p>
+
+  <div class="mobiles">
+    <button class="btn-principal" onclick="choisirMobile('vengeance')">Vengeance personnelle</button>
+    <button class="btn-principal" onclick="choisirMobile('avidite')">Avidité</button>
+    <button class="btn-principal" onclick="choisirMobile('passion')">Passion & Jalousie</button>
+    <button class="btn-principal" onclick="choisirMobile('secret')">Protection d’un secret</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const perso = params.get("perso");
+    const role = params.get("role");
+
+    const nomsComplets = {
+      "agent-securite": "L'Agent de Sécurité",
+      "assistante-production": "L’Assistante de Production",
+      "avocate-stars": "L’Avocate des Stars",
+      "chroniqueuse-mondaine": "La Chroniqueuse Mondaine",
+      "figurante": "La Figurante",
+      "maquilleuse-de-stars": "La Maquilleuse de Stars",
+      "paparazzi": "Le Paparazzi",
+      "producteur": "Le Producteur",
+      "realisateur": "Le Réalisateur",
+      "scenariste": "Le Scénariste"
+    };
+
+    document.getElementById("persoNom").innerText = `Vous incarnez : ${nomsComplets[perso] || perso}`;
+
+    function choisirMobile(mobile) {
+      window.location.href = `suivi.html?code=${code}&perso=${perso}&role=meurtrier&mobile=${mobile}`;
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('✅ SW actif'))
+        .catch(err => console.error('❌ SW KO', err));
+    }
+  </script>
+
+</body>
+</html>

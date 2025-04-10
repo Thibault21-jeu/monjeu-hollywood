@@ -3,77 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HollyBlood - Accueil</title>
+  <title>HollyBlood - Créer une partie</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" href="img/logo.png" />
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
-
-  <style>
-    body {
-      background-color: #1C1C1C;
-      color: #F4F4F4;
-      font-family: 'Inter', sans-serif;
-      text-align: center;
-      padding: 2rem;
-    }
-
-    h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.4rem;
-      color: #C9A227;
-      margin-bottom: 1.5rem;
-    }
-
-    img.logo {
-      width: 200px;
-      margin-bottom: 1rem;
-    }
-
-    p {
-      font-size: 1.1rem;
-      font-style: italic;
-      margin-bottom: 2rem;
-    }
-
-    .btns {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      max-width: 300px;
-      margin: 0 auto;
-    }
-
-    .btns button {
-      background-color: #D41427;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 1rem;
-      font-size: 1.1rem;
-      cursor: pointer;
-    }
-
-    .btns button:hover {
-      background-color: #e02a3b;
-    }
-  </style>
 </head>
 <body>
 
-  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
-  <h1>Bienvenue dans HollyBlood</h1>
+  <button class="btn-retour" onclick="window.location.href='index.html'">⬅ Retour</button>
 
-  <div class="btns">
-    <button onclick="window.location.href='creer.html'">🎬 Créer une partie</button>
-    <button onclick="window.location.href='rejoindre.html'">🎟️ Rejoindre une partie</button>
-  </div>
+  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
+  <h1>Créer une partie</h1>
+
+  <div id="nomScenario">🎥 Nom de la scène : <span id="nom"></span></div>
+
+  <button class="btn-doree" onclick="genererNom()">🔁 Générer un nouveau nom aléatoire</button>
+
+  <br><br>
+  <button class="btn-principal" onclick="creerPartie()">🎬 Créer la partie</button>
 
   <script>
+    const noms = [
+      "Oscars Sanglants",
+      "Silence sur le Meurtre",
+      "Coulisses Fatales",
+      "Le Clap de la Mort",
+      "Crime au Studio 7",
+      "Dernière Prise",
+      "Casting Macabre",
+      "Répétition Mortelle",
+      "Rideau Rouge Sang",
+      "Projecteurs sur le Crime",
+      "Plateau Interdit",
+      "Script Sanglant",
+      "HollyBlood Confidential",
+      "Les Larmes de l'Étoile",
+      "Mort aux Premiers Rôles",
+      "Le Dernier Casting",
+      "Meurtre à la Loge 4",
+      "La Scène de Trop",
+      "Secrets de Backstage",
+      "Le Tournage Maudit",
+      "Silence, ça Tue",
+      "Égo Meurtrier",
+      "Cannes, Caméra, Crime",
+      "Meurtres en Répétition",
+      "Un Rôle à Mourir",
+      "Feux, Caméra... Trépas",
+      "Affaire Classée B",
+      "Minuit au Studio 9"
+    ];
+
+    let nomActuel = "";
+
+    function genererNom() {
+      const alea = noms[Math.floor(Math.random() * noms.length)];
+      nomActuel = alea;
+      document.getElementById("nom").innerText = alea;
+    }
+
+    function creerPartie() {
+      if (!nomActuel) genererNom();
+
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+      const parties = JSON.parse(localStorage.getItem("parties") || "{}");
+      parties[code] = nomActuel;
+      localStorage.setItem("parties", JSON.stringify(parties));
+
+      window.location.href = `page2-joueur.html?code=${code}&createur=1`;
+    }
+
+    genererNom();
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ Service Worker enregistré', reg))
-        .catch(err => console.error('❌ Erreur Service Worker :', err));
+        .then(reg => console.log('✅ SW actif', reg))
+        .catch(err => console.error('❌ SW KO', err));
     }
   </script>
+
 </body>
 </html>

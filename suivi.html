@@ -3,120 +3,130 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suivi des joueurs</title>
+  <title>HollyBlood - Suivi</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
+
   <style>
-    body {
-      background-color: #1C1C1C;
-      color: #F4F4F4;
-      font-family: 'Inter', sans-serif;
-      padding: 2rem;
-      text-align: center;
+    .joueurs {
+      margin: 2rem auto;
+      max-width: 400px;
+      background-color: #2A2A2A;
+      border-radius: 10px;
+      padding: 1rem;
     }
 
-    h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
+    .joueur {
+      border-bottom: 1px solid #444;
+      padding: 0.5rem 0;
+      text-align: left;
+    }
+
+    .code {
+      font-size: 1rem;
       color: #C9A227;
-      margin-bottom: 1rem;
+      margin-top: 1rem;
     }
 
-    h2 {
-      font-size: 1.2rem;
-      color: white;
-      margin-bottom: 1.5rem;
+    .attente {
+      font-style: italic;
+      margin-top: 2rem;
+      color: #aaaaaa;
     }
 
-    ul {
-      list-style: none;
-      padding: 0;
-      margin-bottom: 2rem;
-    }
-
-    li {
-      background-color: #2E2E2E;
-      margin: 0.5rem auto;
-      padding: 0.8rem 1.2rem;
-      border-left: 5px solid #D41427;
-      width: fit-content;
-      border-radius: 4px;
-    }
-
-    .btn {
+    .btn-commencer {
       background-color: #D41427;
       color: white;
       border: none;
-      border-radius: 6px;
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      margin-top: 2rem;
       cursor: pointer;
-      margin: 0.5rem;
     }
 
-    .btn:hover {
+    .btn-commencer:hover {
       background-color: #e02a3b;
-    }
-
-    .btn-dore {
-      background-color: #C9A227;
-      color: #1C1C1C;
-      font-weight: bold;
-    }
-
-    .btn-dore:hover {
-      background-color: #e0bc44;
     }
   </style>
 </head>
 <body>
 
-  <h1>Suivi de la partie</h1>
-  <h2 id="game-name-display"></h2>
+  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
+  <h1>🎬 Suivi de la distribution</h1>
+  <div class="info" id="partieInfo"></div>
 
-  <div id="player-count"></div>
-  <ul id="player-list"></ul>
+  <div class="joueurs" id="listeJoueurs">
+    <p>Chargement des joueurs...</p>
+  </div>
 
-  <button class="btn" onclick="retourQR()">← Retour au QR code</button>
-  <button class="btn btn-dore" id="btn-lancer">🎬 Le casting est complet, la partie commence !</button>
+  <div id="actionZone"></div>
 
   <script>
+    const nomsComplets = {
+      "agent-securite": "L'Agent de Sécurité",
+      "assistante-production": "L’Assistante de Production",
+      "avocate-stars": "L’Avocate des Stars",
+      "chroniqueuse-mondaine": "La Chroniqueuse Mondaine",
+      "figurante": "La Figurante",
+      "maquilleuse-de-stars": "La Maquilleuse de Stars",
+      "paparazzi": "Le Paparazzi",
+      "producteur": "Le Producteur",
+      "realisateur": "Le Réalisateur",
+      "scenariste": "Le Scénariste"
+    };
+
     const urlParams = new URLSearchParams(window.location.search);
-    const gameName = urlParams.get("game-name");
-    const key = `joueurs_${gameName}`;
-    const cleLancement = `lancement_partie_${gameName}`;
+    const code = urlParams.get("code");
+    const createur = urlParams.get("createur") === "1";
+    const perso = urlParams.get("perso");
+    const role = urlParams.get("role");
+    const mobile = urlParams.get("mobile") || null;
 
-    document.getElementById("game-name-display").textContent = `Partie : ${gameName}`;
+    const partieCle = `joueurs-${code}`;
+    const joueurs = JSON.parse(localStorage.getItem(partieCle) || "[]");
 
-    function actualiserListeJoueurs() {
-      const joueurs = JSON.parse(localStorage.getItem(key)) || [];
-
-      const texteJoueurs = joueurs.length === 1
-        ? "1 joueur connecté :"
-        : `${joueurs.length} joueurs connectés :`;
-      document.getElementById("player-count").textContent = texteJoueurs;
-
-      const list = document.getElementById("player-list");
-      list.innerHTML = "";
-      joueurs.forEach(j => {
-        const li = document.createElement("li");
-        li.textContent = j.personnage;
-        list.appendChild(li);
-      });
+    const dejaAjoute = joueurs.some(j => j.perso === perso);
+    if (!dejaAjoute && perso && role) {
+      joueurs.push({ perso, role, mobile });
+      localStorage.setItem(partieCle, JSON.stringify(joueurs));
     }
 
-    actualiserListeJoueurs();
-    setInterval(actualiserListeJoueurs, 3000);
+    const parties = JSON.parse(localStorage.getItem("parties") || "{}");
+    const nom = parties[code] || "Sans nom";
+    document.getElementById("partieInfo").innerText = `🎥 Scène : ${nom} | Code : ${code}`;
 
-    function retourQR() {
-      const joueurs = JSON.parse(localStorage.getItem(key)) || [];
-      const joueur1 = joueurs[0] || { personnage: "", role: "", mobile: "" };
-      window.location.href = `page4.html?game-name=${encodeURIComponent(gameName)}&character=${encodeURIComponent(joueur1.personnage)}&role=${encodeURIComponent(joueur1.role)}&mobile=${encodeURIComponent(joueur1.mobile || "")}`;
-    }
+    const container = document.getElementById("listeJoueurs");
+    container.innerHTML = "";
 
-    document.getElementById("btn-lancer").addEventListener("click", () => {
-      localStorage.setItem(cleLancement, "true");
-      window.location.href = "debut.html";
+    joueurs.forEach(joueur => {
+      const div = document.createElement("div");
+      div.className = "joueur";
+      div.innerText = `🎭 ${nomsComplets[joueur.perso] || joueur.perso}`;
+      container.appendChild(div);
     });
+
+    const actionZone = document.getElementById("actionZone");
+    if (createur) {
+      const btn = document.createElement("button");
+      btn.className = "btn-commencer";
+      btn.innerText = "🎬 Le casting est complet, la partie commence !";
+      btn.onclick = () => alert("Début de la partie (à connecter)");
+      actionZone.appendChild(btn);
+    } else {
+      const attente = document.createElement("div");
+      attente.className = "attente";
+      attente.innerText = "🎬 Patientez... Le rideau se lèvera quand le joueur qui a généré le code lancera la partie.";
+      actionZone.appendChild(attente);
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('✅ SW actif'))
+        .catch(err => console.error('❌ SW KO', err));
+    }
   </script>
 
 </body>

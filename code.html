@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HollyBlood - Code de la partie</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="img/logo.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
+
+  <style>
+    .code-container {
+      background-color: #2A2A2A;
+      border: 2px solid #C9A227;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem auto 1rem;
+      max-width: 280px;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #C9A227;
+      letter-spacing: 2px;
+    }
+
+    .phrase {
+      font-style: italic;
+      color: #ccc;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .joueurs {
+      margin: 2rem auto;
+      max-width: 400px;
+      background-color: #2A2A2A;
+      border-radius: 10px;
+      padding: 1rem;
+    }
+
+    .joueur {
+      border-bottom: 1px solid #444;
+      padding: 0.5rem 0;
+      text-align: left;
+    }
+
+    .btn-commencer {
+      background-color: #D41427;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      margin-top: 2rem;
+      cursor: pointer;
+    }
+
+    .btn-commencer:hover {
+      background-color: #e02a3b;
+    }
+  </style>
+</head>
+<body>
+
+  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
+  <h1>🎟️ Code de la partie</h1>
+
+  <div class="code-container" id="codePartie">000000</div>
+  <p class="phrase">🎟️ Partagez ce code avec les autres joueurs pour qu’ils puissent rejoindre la partie.</p>
+
+  <div class="joueurs" id="listeJoueurs">
+    <p>Chargement des joueurs...</p>
+  </div>
+
+  <div id="actionZone"></div>
+
+  <script>
+    const nomsComplets = {
+      "agent-securite": "L'Agent de Sécurité",
+      "assistante-production": "L’Assistante de Production",
+      "avocate-stars": "L’Avocate des Stars",
+      "chroniqueuse-mondaine": "La Chroniqueuse Mondaine",
+      "figurante": "La Figurante",
+      "maquilleuse-de-stars": "La Maquilleuse de Stars",
+      "paparazzi": "Le Paparazzi",
+      "producteur": "Le Producteur",
+      "realisateur": "Le Réalisateur",
+      "scenariste": "Le Scénariste"
+    };
+
+    // Récupération nom de scène
+    const parties = JSON.parse(localStorage.getItem("parties") || "{}");
+    const nomScene = Object.values(parties).pop(); // dernier nom utilisé
+
+    // Génération du code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById("codePartie").innerText = code;
+
+    // Enregistrement dans localStorage
+    parties[code] = nomScene;
+    localStorage.setItem("parties", JSON.stringify(parties));
+
+    // Initialisation des joueurs
+    const partieCle = `joueurs-${code}`;
+    const joueurs = JSON.parse(localStorage.getItem(partieCle) || "[]");
+    localStorage.setItem(partieCle, JSON.stringify(joueurs)); // crée la clé vide si absente
+
+    function afficherJoueurs() {
+      const joueursActuels = JSON.parse(localStorage.getItem(partieCle) || "[]");
+      const container = document.getElementById("listeJoueurs");
+      container.innerHTML = "";
+
+      joueursActuels.forEach(joueur => {
+        const div = document.createElement("div");
+        div.className = "joueur";
+        div.innerText = `🎭 ${nomsComplets[joueur.perso] || joueur.perso}`;
+        container.appendChild(div);
+      });
+
+      const actionZone = document.getElementById("actionZone");
+      actionZone.innerHTML = "";
+      const btn = document.createElement("button");
+      btn.className = "btn-commencer";
+      btn.innerText = "🎬 Le casting est complet, la partie commence !";
+      btn.onclick = () => alert("Début de la partie (fonction à venir)");
+      actionZone.appendChild(btn);
+    }
+
+    // Mise à jour régulière
+    afficherJoueurs();
+    setInterval(afficherJoueurs, 2000);
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('✅ SW actif'))
+        .catch(err => console.error('❌ SW KO', err));
+    }
+  </script>
+
+</body>
+</html>
