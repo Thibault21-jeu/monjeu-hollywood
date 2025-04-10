@@ -91,7 +91,12 @@
     const parties = JSON.parse(localStorage.getItem("parties") || "{}");
     const nomScene = Object.values(parties).pop();
 
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // Génération sécurisée du code avec exclusion de "210519"
+    let code;
+    do {
+      code = Math.floor(100000 + Math.random() * 900000).toString();
+    } while (code === "210519");
+
     document.getElementById("codePartie").innerText = code;
 
     parties[code] = nomScene;

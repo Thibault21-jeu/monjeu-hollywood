@@ -61,22 +61,44 @@
 
   <p>Entrez le code à 6 chiffres donné par le créateur de la partie :</p>
 
-  <input type="text" id="codePartie" maxlength="6" placeholder="ex : 123456" />
+  <input type="text" id="codePartie" placeholder="ex : 123456" />
 
   <div>
     <button class="btn-principal" onclick="rejoindrePartie()">Rejoindre</button>
   </div>
 
   <script>
+    const inputCode = document.getElementById("codePartie");
+
+    // Autorise 8 chiffres uniquement pour le code admin (commençant par 210519)
+    inputCode.addEventListener('input', function() {
+      const valeur = inputCode.value.trim();
+      if (valeur.startsWith("210519")) {
+        inputCode.maxLength = 8;
+      } else {
+        inputCode.maxLength = 6;
+      }
+
+      if (inputCode.value.length > inputCode.maxLength) {
+        inputCode.value = inputCode.value.slice(0, inputCode.maxLength);
+      }
+    });
+
     function rejoindrePartie() {
-      const code = document.getElementById("codePartie").value.trim();
+      const code = inputCode.value.trim();
+
+      if (code === "21051999") {
+        window.location.href = "admin.html";
+        return;
+      }
+
       if (!code.match(/^\d{6}$/)) {
         alert("Veuillez entrer un code à 6 chiffres.");
         return;
       }
 
-      if (code === "21051999") {
-        window.location.href = "admin.html";
+      if (code === "210519") {
+        alert("Ce code n'est pas autorisé. Veuillez réessayer avec un autre code.");
         return;
       }
 
