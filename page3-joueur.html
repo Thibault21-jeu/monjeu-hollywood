@@ -8,7 +8,6 @@
   <link rel="icon" href="img/logo.png" />
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
-
   <style>
     .btns-role {
       display: flex;
@@ -17,7 +16,6 @@
       max-width: 300px;
       margin: 2rem auto;
     }
-
     .info-choix {
       font-style: italic;
       color: #ccc;
@@ -26,14 +24,10 @@
   </style>
 </head>
 <body>
-
   <button class="btn-retour" onclick="history.back()">⬅ Retour</button>
-
   <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
   <h1>🎬 Votre rôle dans la scène...</h1>
-
   <div class="perso" id="persoNom"></div>
-
   <p class="info-choix">🎭 Choisissez le rôle qui correspond à votre carte...</p>
 
   <div class="btns-role">
@@ -62,6 +56,7 @@
 
     function choisirRole(role) {
       if (role === "innocent") {
+        localStorage.setItem("joueurs-temp", JSON.stringify([{ perso, role }]));
         window.location.href = `code.html?perso=${perso}&role=innocent`;
       } else {
         window.location.href = `choix-mobile.html?perso=${perso}&role=meurtrier`;
@@ -69,11 +64,8 @@
     }
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ SW actif'))
-        .catch(err => console.error('❌ SW KO', err));
+      navigator.serviceWorker.register('service-worker.js');
     }
   </script>
-
 </body>
 </html>

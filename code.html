@@ -88,29 +88,31 @@
       "scenariste": "Le Scénariste"
     };
 
-    // Récupération nom de scène
     const parties = JSON.parse(localStorage.getItem("parties") || "{}");
-    const nomScene = Object.values(parties).pop(); // dernier nom utilisé
+    const nomScene = Object.values(parties).pop();
 
-    // Génération du code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     document.getElementById("codePartie").innerText = code;
 
-    // Enregistrement dans localStorage
     parties[code] = nomScene;
     localStorage.setItem("parties", JSON.stringify(parties));
 
-    // Initialisation des joueurs
     const partieCle = `joueurs-${code}`;
-    const joueurs = JSON.parse(localStorage.getItem(partieCle) || "[]");
-    localStorage.setItem(partieCle, JSON.stringify(joueurs)); // crée la clé vide si absente
+    const temp = JSON.parse(localStorage.getItem("joueurs-temp") || "[]");
+
+    if (temp.length > 0) {
+      localStorage.removeItem("joueurs-temp");
+      localStorage.setItem(partieCle, JSON.stringify(temp));
+    } else {
+      localStorage.setItem(partieCle, JSON.stringify([]));
+    }
 
     function afficherJoueurs() {
-      const joueursActuels = JSON.parse(localStorage.getItem(partieCle) || "[]");
+      const joueurs = JSON.parse(localStorage.getItem(partieCle) || "[]");
       const container = document.getElementById("listeJoueurs");
       container.innerHTML = "";
 
-      joueursActuels.forEach(joueur => {
+      joueurs.forEach(joueur => {
         const div = document.createElement("div");
         div.className = "joueur";
         div.innerText = `🎭 ${nomsComplets[joueur.perso] || joueur.perso}`;
@@ -126,7 +128,6 @@
       actionZone.appendChild(btn);
     }
 
-    // Mise à jour régulière
     afficherJoueurs();
     setInterval(afficherJoueurs, 2000);
 
