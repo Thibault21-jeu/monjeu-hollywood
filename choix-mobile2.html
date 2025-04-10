@@ -28,7 +28,6 @@
 <body>
 
   <button class="btn-retour" onclick="history.back()">⬅ Retour</button>
-
   <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
   <h1>💀 Votre mobile...</h1>
 
@@ -63,13 +62,15 @@
     document.getElementById("persoNom").innerText = `Vous incarnez : ${nomsComplets[perso] || perso}`;
 
     function choisirMobile(mobile) {
+      const cle = `joueurs-${code}`;
+      const liste = JSON.parse(localStorage.getItem(cle) || "[]");
+      liste.push({ perso, role: "meurtrier", mobile });
+      localStorage.setItem(cle, JSON.stringify(liste));
       window.location.href = `suivi.html?code=${code}&perso=${perso}&role=meurtrier&mobile=${mobile}`;
     }
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ SW actif'))
-        .catch(err => console.error('❌ SW KO', err));
+      navigator.serviceWorker.register('service-worker.js');
     }
   </script>
 
