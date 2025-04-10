@@ -61,8 +61,8 @@
 
   <p>Entrez le code à 6 chiffres donné par le créateur de la partie :</p>
 
-  <!-- ⚠️ aucun maxlength ici -->
-  <input type="text" id="codePartie" placeholder="ex : 123456" />
+  <!-- Modification ICI : type="tel", autocomplete="off" -->
+  <input type="tel" id="codePartie" placeholder="ex : 123456" autocomplete="off" />
 
   <div>
     <button class="btn-principal" onclick="rejoindrePartie()">Rejoindre</button>
