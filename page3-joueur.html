@@ -43,7 +43,6 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
     const perso = params.get("perso");
 
     const nomsComplets = {
@@ -63,9 +62,9 @@
 
     function choisirRole(role) {
       if (role === "innocent") {
-        window.location.href = `suivi.html?code=${code}&perso=${perso}&role=innocent`;
+        window.location.href = `code.html?perso=${perso}&role=innocent`;
       } else {
-        window.location.href = `choix-mobile2.html?code=${code}&perso=${perso}&role=meurtrier`;
+        window.location.href = `choix-mobile.html?perso=${perso}&role=meurtrier`;
       }
     }
 
