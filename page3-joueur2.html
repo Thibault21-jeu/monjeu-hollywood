@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HollyBlood - Choix du mobile</title>
+  <title>HollyBlood - Choix du rôle</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="img/logo.png" />
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
 
   <style>
-    .mobiles {
+    .btns-role {
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      max-width: 350px;
+      max-width: 300px;
       margin: 2rem auto;
     }
 
@@ -30,16 +30,15 @@
   <button class="btn-retour" onclick="history.back()">⬅ Retour</button>
 
   <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
-  <h1>💀 Votre mobile...</h1>
+  <h1>🎬 Votre rôle dans la scène...</h1>
 
   <div class="perso" id="persoNom"></div>
-  <p class="info-choix">🧠 Choisissez la raison qui vous a poussé à commettre ce crime...</p>
 
-  <div class="mobiles">
-    <button class="btn-principal" onclick="choisirMobile('vengeance')">Vengeance personnelle</button>
-    <button class="btn-principal" onclick="choisirMobile('avidite')">Avidité</button>
-    <button class="btn-principal" onclick="choisirMobile('passion')">Passion & Jalousie</button>
-    <button class="btn-principal" onclick="choisirMobile('secret')">Protection d’un secret</button>
+  <p class="info-choix">🎭 Choisissez le rôle qui correspond à votre carte...</p>
+
+  <div class="btns-role">
+    <button class="btn-principal" onclick="choisirRole('innocent')">Je suis Innocent</button>
+    <button class="btn-principal" onclick="choisirRole('meurtrier')">Je suis le Meurtrier</button>
   </div>
 
   <script>
@@ -62,8 +61,12 @@
 
     document.getElementById("persoNom").innerText = `Vous incarnez : ${nomsComplets[perso] || perso}`;
 
-    function choisirMobile(mobile) {
-      window.location.href = `suivi.html?code=${code}&perso=${perso}&role=meurtrier&mobile=${mobile}`;
+    function choisirRole(role) {
+      if (role === "innocent") {
+        window.location.href = `suivi.html?code=${code}&perso=${perso}&role=innocent`;
+      } else {
+        window.location.href = `choix-mobile2.html?code=${code}&perso=${perso}&role=meurtrier`;
+      }
     }
 
     if ('serviceWorker' in navigator) {
