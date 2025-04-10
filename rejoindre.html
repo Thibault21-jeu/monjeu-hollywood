@@ -61,7 +61,6 @@
 
   <p>Entrez le code à 6 chiffres donné par le créateur de la partie :</p>
 
-  <!-- Modification ICI : type="tel", autocomplete="off" -->
   <input type="tel" id="codePartie" placeholder="ex : 123456" autocomplete="off" />
 
   <div>
@@ -72,8 +71,13 @@
     function rejoindrePartie() {
       const code = document.getElementById("codePartie").value.trim();
 
-      if (code === "21051999") {
-        window.location.href = "admin.html";
+      if (code === "000000") {
+        const adminCode = prompt("🔐 Veuillez entrer le code administrateur :");
+        if (adminCode === "21051999") {
+          window.location.href = "admin.html";
+        } else {
+          alert("🚫 Code administrateur incorrect !");
+        }
         return;
       }
 
