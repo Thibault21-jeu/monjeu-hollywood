@@ -1,115 +1,141 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HollyBlood - Sélection du personnage</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="img/logo.png" />
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HollyBlood - Choix du personnage</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    .personnages {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      max-width: 400px;
-      margin: 2rem auto;
-    }
-
-    .personnage-btn {
-      background-color: #D41427;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 1rem;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    body {
+      background-color: #1C1C1C;
+      color: #F4F4F4;
+      font-family: 'Inter', sans-serif;
       text-align: center;
-      line-height: 1.2;
+      padding: 2rem;
     }
 
-    .personnage-btn:hover {
-      background-color: #e02a3b;
+    h1 {
+      font-size: 1.8rem;
+      color: #C9A227;
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 1rem;
     }
 
-    .disabled {
-      background-color: #555 !important;
+    .perso-btn {
+      display: inline-block;
+      margin: 0.5rem;
+      padding: 1rem;
+      border: 2px solid #C9A227;
+      border-radius: 8px;
+      background-color: transparent;
+      color: #F4F4F4;
+      font-size: 1rem;
+      width: 200px;
+      cursor: pointer;
+    }
+
+    .perso-btn:disabled {
+      opacity: 0.4;
       cursor: not-allowed;
-      opacity: 0.6;
+    }
+
+    .logo {
+      width: 150px;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
 
-  <button class="btn-retour" onclick="window.location.href='rejoindre.html'">⬅ Retour</button>
-
   <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
-  <h1>🎭 Distribution des rôles</h1>
+  <h1>🎭 Choisissez votre personnage</h1>
+  <p id="codeAffichage"></p>
 
-  <p style="font-style: italic; color: #ccc; margin-top: 1rem;">
-    🎴 Indiquez la carte personnage que vous avez tirée...
-  </p>
+  <div id="personnages"></div>
 
-  <div class="personnages" id="listePersonnages"></div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, getDocs, query, where
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDV1oGErhV0Pt87PsZYiKFFmE4xh5BGMH8",
+      authDomain: "hollyblood-b320e.firebaseapp.com",
+      projectId: "hollyblood-b320e",
+      storageBucket: "hollyblood-b320e.appspot.com",
+      messagingSenderId: "907978882652",
+      appId: "1:907978882652:web:58505cf1d65a00635df099"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
 
+    if (!code) {
+      alert("Aucun code de partie trouvé dans l’URL.");
+      location.href = "rejoindre.html";
+    }
+
+    document.getElementById("codeAffichage").innerText = `🎬 Code de la partie : ${code}`;
+
     const personnages = [
-      { id: "agent-securite", nom: "L'Agent de Sécurité" },
-      { id: "assistante-production", nom: "L’Assistante de Production" },
-      { id: "avocate-stars", nom: "L’Avocate des Stars" },
-      { id: "chroniqueuse-mondaine", nom: "La Chroniqueuse Mondaine" },
-      { id: "figurante", nom: "La Figurante" },
-      { id: "maquilleuse-de-stars", nom: "La Maquilleuse de Stars" },
-      { id: "paparazzi", nom: "Le Paparazzi" },
-      { id: "producteur", nom: "Le Producteur" },
-      { id: "realisateur", nom: "Le Réalisateur" },
-      { id: "scenariste", nom: "Le Scénariste" }
+      "agent-securite",
+      "assistante-production",
+      "avocate-stars",
+      "chroniqueuse-mondaine",
+      "figurante",
+      "maquilleuse-de-stars",
+      "paparazzi",
+      "producteur",
+      "realisateur",
+      "scenariste"
     ];
 
-    const container = document.getElementById("listePersonnages");
+    const nomsComplets = {
+      "agent-securite": "L'Agent de Sécurité",
+      "assistante-production": "L’Assistante de Production",
+      "avocate-stars": "L’Avocate des Stars",
+      "chroniqueuse-mondaine": "La Chroniqueuse Mondaine",
+      "figurante": "La Figurante",
+      "maquilleuse-de-stars": "La Maquilleuse de Stars",
+      "paparazzi": "Le Paparazzi",
+      "producteur": "Le Producteur",
+      "realisateur": "Le Réalisateur",
+      "scenariste": "Le Scénariste"
+    };
 
-    // Personnages déjà pris
-    const joueurs = JSON.parse(localStorage.getItem(`joueurs-${code}`) || "[]");
-    const persosPris = joueurs.map(j => j.perso);
+    const container = document.getElementById("personnages");
 
-    // Joueur déjà en cours (revient en arrière)
-    const joueurTemp = JSON.parse(localStorage.getItem("joueur-en-cours") || "null");
-    if (joueurTemp && joueurTemp.code === code && joueurTemp.perso) {
-      persosPris.push(joueurTemp.perso);
-    }
+    async function afficherPersonnages() {
+      const joueursSnap = await getDocs(collection(db, "joueurs-" + code));
+      const persosDejaPris = joueursSnap.docs.map(doc => doc.data().perso);
 
-    personnages.forEach(p => {
-      const btn = document.createElement("button");
-      btn.className = "personnage-btn";
-      btn.innerText = p.nom;
+      personnages.forEach(perso => {
+        const btn = document.createElement("button");
+        btn.className = "perso-btn";
+        btn.innerText = nomsComplets[perso];
+        btn.disabled = persosDejaPris.includes(perso);
 
-      const dejaPris = persosPris.includes(p.id);
-      if (dejaPris) {
-        btn.classList.add("disabled");
-        btn.disabled = true;
-      } else {
-        btn.onclick = () => {
-          localStorage.setItem("joueur-en-cours", JSON.stringify({ code, perso: p.id }));
-          window.location.href = `page3-joueur2.html?code=${code}&perso=${p.id}`;
+        btn.onclick = async () => {
+          await addDoc(collection(db, "joueurs-" + code), {
+            perso: perso,
+            role: "innocent",
+            mobile: null,
+            timestamp: Date.now()
+          });
+
+          alert("🎉 Personnage sélectionné !");
+          window.location.href = `suivi.html?code=${code}`;
         };
-      }
 
-      container.appendChild(btn);
-    });
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
+        container.appendChild(btn);
+      });
     }
+
+    afficherPersonnages();
   </script>
 
 </body>

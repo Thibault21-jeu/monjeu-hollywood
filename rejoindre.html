@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HollyBlood - Rejoindre une partie</title>
-  <link rel="manifest" href="manifest.json" />
+  <title>Hollyblood - Rejoindre une partie</title>
   <link rel="icon" href="img/logo.png" />
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
   <style>
     body {
       background-color: #1C1C1C;
@@ -56,7 +54,7 @@
 </head>
 <body>
 
-  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
+  <img src="img/logo.png" alt="Logo Hollyblood" class="logo" />
   <h1>🎟️ Rejoindre une partie</h1>
 
   <p>Entrez le code à 6 chiffres donné par le créateur de la partie :</p>
@@ -67,10 +65,28 @@
     <button class="btn-principal" onclick="rejoindrePartie()">Rejoindre</button>
   </div>
 
-  <script>
-    function rejoindrePartie() {
+  <!-- Connexion à Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDV1oGErhV0Pt87PsZYiKFFmE4xh5BGMH8",
+      authDomain: "hollyblood-b320e.firebaseapp.com",
+      projectId: "hollyblood-b320e",
+      storageBucket: "hollyblood-b320e.appspot.com",
+      messagingSenderId: "907978882652",
+      appId: "1:907978882652:web:58505cf1d65a00635df099",
+      measurementId: "G-TD0KM8MTVM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function rejoindrePartie() {
       const code = document.getElementById("codePartie").value.trim();
 
+      // Code admin
       if (code === "000000") {
         const adminCode = prompt("🔐 Veuillez entrer le code administrateur :");
         if (adminCode === "21051999") {
@@ -78,32 +94,33 @@
         } else {
           alert("🚫 Code administrateur incorrect !");
         }
-        return; // ← empêche la suite du script de s'exécuter
-      }
-
-      if (code === "210519") {
-        alert("Ce code n'est pas autorisé. Veuillez réessayer avec un autre code.");
         return;
       }
 
-      if (!code.match(/^\d{6}$/)) {
+      // Vérification du format (6 chiffres uniquement)
+      if (!/^\d{6}$/.test(code)) {
         alert("Veuillez entrer un code à 6 chiffres valide.");
         return;
       }
 
-      const parties = JSON.parse(localStorage.getItem("parties") || "{}");
-      if (!parties[code]) {
-        alert("Cette partie n'existe pas.");
+      if (code === "210519") {
+        alert("Ce code n'est pas autorisé.");
         return;
       }
 
-      window.location.href = `page2-joueur2.html?code=${code}`;
-    }
+      try {
+        const partieRef = doc(db, "parties", code);
+        const docSnap = await getDoc(partieRef);
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ SW actif'))
-        .catch(err => console.error('❌ SW KO', err));
+        if (docSnap.exists()) {
+          window.location.href = `page2-joueur2.html?code=${code}`;
+        } else {
+          alert("❌ Cette partie n'existe pas.");
+        }
+      } catch (error) {
+        console.error("Erreur Firebase :", error);
+        alert("Erreur lors de la connexion à la base de données.");
+      }
     }
   </script>
 

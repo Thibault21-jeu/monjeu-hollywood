@@ -4,12 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HollyBlood - Code de la partie</title>
-  <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="img/logo.png" />
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
-
   <style>
+    body {
+      background-color: #1C1C1C;
+      color: #F4F4F4;
+      font-family: 'Inter', sans-serif;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #C9A227;
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 1rem;
+    }
+
     .code-container {
       background-color: #2A2A2A;
       border: 2px solid #C9A227;
@@ -36,12 +48,12 @@
       background-color: #2A2A2A;
       border-radius: 10px;
       padding: 1rem;
+      text-align: left;
     }
 
     .joueur {
       border-bottom: 1px solid #444;
       padding: 0.5rem 0;
-      text-align: left;
     }
 
     .btn-commencer {
@@ -63,7 +75,7 @@
 <body>
 
   <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
-  <h1>🎟️ Code de la partie</h1>
+  <h1>🎬 Code de la partie</h1>
 
   <div class="code-container" id="codePartie">000000</div>
   <p class="phrase">🎟️ Partagez ce code avec les autres joueurs pour qu’ils puissent rejoindre la partie.</p>
@@ -74,53 +86,65 @@
 
   <div id="actionZone"></div>
 
-  <script>
-    const nomsComplets = {
-      "agent-securite": "L'Agent de Sécurité",
-      "assistante-production": "L’Assistante de Production",
-      "avocate-stars": "L’Avocate des Stars",
-      "chroniqueuse-mondaine": "La Chroniqueuse Mondaine",
-      "figurante": "La Figurante",
-      "maquilleuse-de-stars": "La Maquilleuse de Stars",
-      "paparazzi": "Le Paparazzi",
-      "producteur": "Le Producteur",
-      "realisateur": "Le Réalisateur",
-      "scenariste": "Le Scénariste"
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore, doc, setDoc, collection, addDoc, onSnapshot, getDocs, query, where
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDV1oGErhV0Pt87PsZYiKFFmE4xh5BGMH8",
+      authDomain: "hollyblood-b320e.firebaseapp.com",
+      projectId: "hollyblood-b320e",
+      storageBucket: "hollyblood-b320e.appspot.com",
+      messagingSenderId: "907978882652",
+      appId: "1:907978882652:web:58505cf1d65a00635df099"
     };
 
-    const parties = JSON.parse(localStorage.getItem("parties") || "{}");
-    const nomScene = Object.values(parties).pop();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    // Génération sécurisée du code avec exclusion de "210519"
-    let code;
-    do {
-      code = Math.floor(100000 + Math.random() * 900000).toString();
-    } while (code === "210519");
+    const nomScene = localStorage.getItem("nomScene") || "Scène sans nom";
+    const perso = localStorage.getItem("perso") || "inconnu";
+    const role = localStorage.getItem("role") || "innocent";
+    const mobile = localStorage.getItem("mobile") || null;
 
-    document.getElementById("codePartie").innerText = code;
-
-    parties[code] = nomScene;
-    localStorage.setItem("parties", JSON.stringify(parties));
-
-    const partieCle = `joueurs-${code}`;
-    const temp = JSON.parse(localStorage.getItem("joueurs-temp") || "[]");
-
-    if (temp.length > 0) {
-      localStorage.removeItem("joueurs-temp");
-      localStorage.setItem(partieCle, JSON.stringify(temp));
-    } else {
-      localStorage.setItem(partieCle, JSON.stringify([]));
+    function genererCode() {
+      let code;
+      do {
+        code = Math.floor(100000 + Math.random() * 900000).toString();
+      } while (code === "000000" || code === "210519");
+      return code;
     }
 
-    function afficherJoueurs() {
-      const joueurs = JSON.parse(localStorage.getItem(partieCle) || "[]");
-      const container = document.getElementById("listeJoueurs");
-      container.innerHTML = "";
+    const code = genererCode();
+    document.getElementById("codePartie").innerText = code;
 
-      joueurs.forEach(joueur => {
+    // Création de la partie dans Firestore
+    await setDoc(doc(db, "parties", code), {
+      scene: nomScene,
+      createdAt: Date.now()
+    });
+
+    // Ajout du joueur 1 dans la liste
+    await addDoc(collection(db, "joueurs-" + code), {
+      perso: perso,
+      role: role,
+      mobile: mobile,
+      timestamp: Date.now()
+    });
+
+    // Mise à jour en temps réel de la liste des joueurs
+    const container = document.getElementById("listeJoueurs");
+    const q = query(collection(db, "joueurs-" + code));
+    onSnapshot(q, (snapshot) => {
+      container.innerHTML = "";
+      snapshot.forEach(doc => {
+        const joueur = doc.data();
         const div = document.createElement("div");
         div.className = "joueur";
-        div.innerText = `🎭 ${nomsComplets[joueur.perso] || joueur.perso}`;
+        const label = joueur.perso + (joueur.role === "meurtrier" ? " 🔪" : "");
+        div.innerText = `🎭 ${label}`;
         container.appendChild(div);
       });
 
@@ -129,18 +153,9 @@
       const btn = document.createElement("button");
       btn.className = "btn-commencer";
       btn.innerText = "🎬 Le casting est complet, la partie commence !";
-      btn.onclick = () => alert("Début de la partie (fonction à venir)");
+      btn.onclick = () => alert("Début de la partie (à venir)");
       actionZone.appendChild(btn);
-    }
-
-    afficherJoueurs();
-    setInterval(afficherJoueurs, 2000);
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ SW actif'))
-        .catch(err => console.error('❌ SW KO', err));
-    }
+    });
   </script>
 
 </body>

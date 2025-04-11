@@ -3,65 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HollyBlood - Suivi</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="img/logo.png" />
+  <title>HollyBlood - Suivi du casting</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
-
   <style>
+    body {
+      background-color: #1C1C1C;
+      color: #F4F4F4;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      color: #C9A227;
+      font-size: 2rem;
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 1rem;
+    }
+
     .joueurs {
-      margin: 2rem auto;
-      max-width: 400px;
-      background-color: #2A2A2A;
+      background: #2A2A2A;
       border-radius: 10px;
       padding: 1rem;
+      margin: 2rem auto;
+      max-width: 400px;
+      text-align: left;
     }
 
     .joueur {
       border-bottom: 1px solid #444;
       padding: 0.5rem 0;
-      text-align: left;
+    }
+
+    .btn-lancer {
+      background-color: #D41427;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      margin-top: 1rem;
+      cursor: pointer;
+    }
+
+    .btn-lancer:hover {
+      background-color: #e02a3b;
     }
 
     .attente {
       font-style: italic;
-      color: #ccc;
-      text-align: center;
+      color: #bbb;
       margin-top: 2rem;
     }
 
-    .code-info {
-      background-color: #1C1C1C;
-      padding: 1rem;
-      font-size: 1.2rem;
-      color: #C9A227;
-      text-align: center;
+    .logo {
+      width: 150px;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
 
   <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
-  <h1>🎭 En attente des autres joueurs</h1>
-
-  <div class="code-info" id="affichageCode"></div>
+  <h1>🎥 Suivi des joueurs connectés</h1>
+  <p id="codeAffichage"></p>
 
   <div class="joueurs" id="listeJoueurs">
-    <p>Chargement des joueurs...</p>
+    <p>Chargement...</p>
   </div>
 
-  <div class="attente">
-    🎬 <em>Patientez... Le rideau se lèvera quand le joueur qui a généré le code lancera la partie.</em>
-  </div>
+  <div id="actionZone"></div>
 
-  <script>
-    // Nettoyage de l'entrée temporaire
-    localStorage.removeItem("joueur-en-cours");
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore, collection, onSnapshot, doc, updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    const partieCle = `joueurs-${code}`;
+    const firebaseConfig = {
+      apiKey: "AIzaSyDV1oGErhV0Pt87PsZYiKFFmE4xh5BGMH8",
+      authDomain: "hollyblood-b320e.firebaseapp.com",
+      projectId: "hollyblood-b320e",
+      storageBucket: "hollyblood-b320e.appspot.com",
+      messagingSenderId: "907978882652",
+      appId: "1:907978882652:web:58505cf1d65a00635df099"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    document.getElementById("codeAffichage").innerText = `🎬 Code de la partie : ${code}`;
 
     const nomsComplets = {
       "agent-securite": "L'Agent de Sécurité",
@@ -76,27 +109,58 @@
       "scenariste": "Le Scénariste"
     };
 
-    document.getElementById("affichageCode").innerText = `Code de la partie : ${code}`;
+    const liste = document.getElementById("listeJoueurs");
+    const actionZone = document.getElementById("actionZone");
 
-    function afficherJoueurs() {
-      const joueurs = JSON.parse(localStorage.getItem(partieCle) || "[]");
-      const container = document.getElementById("listeJoueurs");
-      container.innerHTML = "";
+    const joueurActuel = {
+      perso: localStorage.getItem("perso"),
+      role: localStorage.getItem("role")
+    };
 
-      joueurs.forEach(joueur => {
+    const estMJ = joueurActuel && joueurActuel.perso && joueurActuel.role;
+
+    // 🔁 Écoute la liste des joueurs
+    const q = collection(db, "joueurs-" + code);
+    onSnapshot(q, (snapshot) => {
+      liste.innerHTML = "";
+      snapshot.forEach(doc => {
+        const joueur = doc.data();
         const div = document.createElement("div");
         div.className = "joueur";
-        div.innerText = `🎭 ${nomsComplets[joueur.perso] || joueur.perso}`;
-        container.appendChild(div);
+        const roleStr = joueur.role === "meurtrier" ? " 🔪" : "";
+        div.innerText = `🎭 ${nomsComplets[joueur.perso] || joueur.perso}${roleStr}`;
+        liste.appendChild(div);
       });
-    }
 
-    afficherJoueurs();
-    setInterval(afficherJoueurs, 2000);
+      actionZone.innerHTML = "";
+      if (estMJ) {
+        const btn = document.createElement("button");
+        btn.className = "btn-lancer";
+        btn.innerText = "🎬 Le casting est complet, la partie commence !";
+        btn.onclick = async () => {
+          await updateDoc(doc(db, "parties", code), {
+            etat: "en_cours"
+          });
+        };
+        actionZone.appendChild(btn);
+      } else {
+        const p = document.createElement("p");
+        p.className = "attente";
+        p.innerText = "🎬 Patientez... Le rideau se lèvera quand le joueur qui a généré la partie lancera le jeu.";
+        actionZone.appendChild(p);
+      }
+    });
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
+    // 🔁 Écoute du lancement de la partie
+    const partieRef = doc(db, "parties", code);
+    onSnapshot(partieRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.etat === "en_cours") {
+          window.location.href = "partie.html";
+        }
+      }
+    });
   </script>
 
 </body>
