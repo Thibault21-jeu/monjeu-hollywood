@@ -76,9 +76,14 @@
   </div>
 
   <script>
-    // Récupération des infos du scénario depuis localStorage
-    const scenar = localStorage.getItem("scenar");
-    const code = localStorage.getItem("code");
+    // Récupération depuis URL ou localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const scenar = urlParams.get("scenar") || localStorage.getItem("scenar");
+    const code = urlParams.get("code") || localStorage.getItem("code");
+
+    // Enregistrement dans localStorage
+    if (scenar) localStorage.setItem("scenar", scenar);
+    if (code) localStorage.setItem("code", code);
 
     // Affichage du nom de la partie
     if (scenar) {
@@ -95,11 +100,9 @@
         return;
       }
 
-      // Enregistrement
       localStorage.setItem("perso", perso);
       localStorage.setItem("createur", createur);
 
-      // Redirection
       const url = `page3-joueur.html?perso=${perso}&createur=${createur}&code=${code}&scenar=${encodeURIComponent(scenar)}`;
       window.location.href = url;
     }
