@@ -71,11 +71,11 @@
     <button class="button" id="boutonRejoindre" onclick="rejoindrePartie()" disabled>Rejoindre une partie</button>
   </div>
 
-  <!-- Firebase App -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
 
+  <script>
     const firebaseConfig = {
       apiKey: "TA_CLE_API",
       authDomain: "TON_PROJET.firebaseapp.com",
@@ -86,30 +86,43 @@
       appId: "TON_APP_ID"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    window.creerPartie = async function () {
+    function genererCodePartie() {
+      return Math.floor(100000 + Math.random() * 900000);
+    }
+
+    function creerPartie() {
       const scenar = "Hollywood Confidentiel";
-      const code = Math.floor(100000 + Math.random() * 900000);
+      const code = genererCodePartie();
 
-      // Enregistrement dans Firebase
-      await set(ref(db, 'parties/' + code), {
+      // Créer la partie dans Firebase
+      db.ref("parties/" + code).set({
         scenar: scenar,
         createur: true,
-        joueurs: []
+        joueurs: {}
+      }).then(() => {
+        window.location.href = `page2-joueur.html?code=${code}&createur=1`;
+      }).catch((error) => {
+        alert("Erreur lors de la création de la partie : " + error.message);
       });
-
-      window.location.href = `page2-joueur.html?code=${code}&createur=1`;
     }
 
-    window.verifierCode = function () {
+    function verifierCode() {
       const code = document.getElementById("codePartie").value;
-      document.getElementById("boutonRejoindre").disabled = !/^\d{6}$/.test(code);
+      const bouton = document.getElementById("boutonRejoindre");
+      bouton.disabled = !/^\d{6}$/.test(code);
     }
 
-    window.rejoindrePartie = function () {
+    function rejoindrePartie() {
       const code = document.getElementById("codePartie").value;
+
+      if (code === "000000") {
+        window.location.href = "admin.html";
+        return;
+      }
+
       if (/^\d{6}$/.test(code)) {
         window.location.href = `page2-joueur2.html?code=${code}`;
       } else {
