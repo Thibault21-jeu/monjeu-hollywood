@@ -1,88 +1,107 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HollyBlood - Choix du personnage</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="img/logo.png" />
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
-
+  <meta charset="UTF-8">
+  <title>Distribution des rôles</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    .personnages {
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: 'Georgia', serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: red;
+      text-align: left;
+      font-size: 1.6em;
+    }
+    h2 {
+      color: red;
+      font-size: 2em;
+      margin-top: 30px;
+    }
+    .sous-titre {
+      font-style: italic;
+      color: white;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    .boutons-personnages {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
+      gap: 15px;
       max-width: 400px;
-      margin: 2rem auto;
+      margin: 0 auto;
     }
-
-    .personnage-btn {
-      background-color: #D41427;
+    button {
+      background-color: #8B0000;
       color: white;
       border: none;
-      border-radius: 12px;
-      padding: 1rem;
-      font-size: 1rem;
+      padding: 15px;
+      font-size: 1em;
+      border-radius: 10px;
       cursor: pointer;
-      transition: background-color 0.2s;
-      height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      line-height: 1.2;
+      width: 100%;
     }
-
-    .personnage-btn:hover {
-      background-color: #e02a3b;
+    button:hover {
+      background-color: #aa0000;
+    }
+    #logo {
+      max-width: 200px;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
 
-  <button class="btn-retour" onclick="window.location.href='creer.html'">⬅ Retour</button>
+  <img src="img/logo.png" alt="Logo du jeu" id="logo">
 
-  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
-  <h1>🎭 Distribution des rôles</h1>
+  <h1 id="partieInfo">Partie :</h1>
+  <h2>Distribution des rôles</h2>
+  <p class="sous-titre">Je suis...</p>
 
-  <p style="font-style: italic; color: #ccc; margin-top: 1rem;">
-    🎴 Indiquez la carte personnage que vous avez tirée...
-  </p>
-
-  <div class="personnages" id="listePersonnages"></div>
+  <div class="boutons-personnages">
+    <button onclick="allerEtapeSuivante('agent-securite', 1)">L'Agent de Sécurité</button>
+    <button onclick="allerEtapeSuivante('assistante-production', 1)">L'Assistante de Production</button>
+    <button onclick="allerEtapeSuivante('avocate-stars', 1)">L'Avocate des Stars</button>
+    <button onclick="allerEtapeSuivante('chroniqueuse-mondaine', 1)">La Chroniqueuse Mondaine</button>
+    <button onclick="allerEtapeSuivante('figurante', 1)">La Figurante</button>
+    <button onclick="allerEtapeSuivante('maquilleuse-de-stars', 1)">La Maquilleuse de Stars</button>
+    <button onclick="allerEtapeSuivante('paparazzi', 1)">Le Paparazzi</button>
+    <button onclick="allerEtapeSuivante('producteur', 1)">Le Producteur</button>
+    <button onclick="allerEtapeSuivante('realisateur', 1)">Le Réalisateur</button>
+    <button onclick="allerEtapeSuivante('scenariste', 1)">Le Scénariste</button>
+  </div>
 
   <script>
-    const personnages = [
-      { id: "agent-securite", nom: "L'Agent de Sécurité" },
-      { id: "assistante-production", nom: "L’Assistante de Production" },
-      { id: "avocate-stars", nom: "L’Avocate des Stars" },
-      { id: "chroniqueuse-mondaine", nom: "La Chroniqueuse Mondaine" },
-      { id: "figurante", nom: "La Figurante" },
-      { id: "maquilleuse-de-stars", nom: "La Maquilleuse de Stars" },
-      { id: "paparazzi", nom: "Le Paparazzi" },
-      { id: "producteur", nom: "Le Producteur" },
-      { id: "realisateur", nom: "Le Réalisateur" },
-      { id: "scenariste", nom: "Le Scénariste" }
-    ];
+    // Récupération des infos du scénario depuis localStorage
+    const scenar = localStorage.getItem("scenar");
+    const code = localStorage.getItem("code");
 
-    const container = document.getElementById("listePersonnages");
+    // Affichage du nom de la partie
+    if (scenar) {
+      document.getElementById("partieInfo").innerText = "Partie : " + scenar;
+    } else {
+      alert("Nom du scénario manquant. Veuillez recommencer depuis l'accueil.");
+      window.location.href = "index.html";
+    }
 
-    personnages.forEach(p => {
-      const btn = document.createElement("button");
-      btn.className = "personnage-btn";
-      btn.innerText = p.nom;
-      btn.onclick = () => {
-        window.location.href = `page3-joueur.html?perso=${p.id}&createur=1`;
-      };
-      container.appendChild(btn);
-    });
+    function allerEtapeSuivante(perso, createur) {
+      if (!code || !scenar || !perso) {
+        alert("Informations manquantes. Merci de recommencer depuis la page d’accueil.");
+        window.location.href = "index.html";
+        return;
+      }
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ SW actif'))
-        .catch(err => console.error('❌ SW KO', err));
+      // Enregistrement
+      localStorage.setItem("perso", perso);
+      localStorage.setItem("createur", createur);
+
+      // Redirection
+      const url = `page3-joueur.html?perso=${perso}&createur=${createur}&code=${code}&scenar=${encodeURIComponent(scenar)}`;
+      window.location.href = url;
     }
   </script>
 
