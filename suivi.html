@@ -1,165 +1,104 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HollyBlood - Suivi du casting</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Suivi des joueurs</title>
+  <link rel="stylesheet" href="style.css">
   <style>
     body {
-      background-color: #1C1C1C;
-      color: #F4F4F4;
-      font-family: 'Inter', sans-serif;
-      text-align: center;
-      padding: 2rem;
-    }
-
-    h1 {
-      color: #C9A227;
-      font-size: 2rem;
-      font-family: 'Playfair Display', serif;
-      margin-bottom: 1rem;
-    }
-
-    .joueurs {
-      background: #2A2A2A;
-      border-radius: 10px;
-      padding: 1rem;
-      margin: 2rem auto;
-      max-width: 400px;
-      text-align: left;
-    }
-
-    .joueur {
-      border-bottom: 1px solid #444;
-      padding: 0.5rem 0;
-    }
-
-    .btn-lancer {
-      background-color: #D41427;
+      background-color: #121212;
       color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 1rem 2rem;
-      font-size: 1.1rem;
-      margin-top: 1rem;
-      cursor: pointer;
+      font-family: 'Georgia', serif;
+      padding: 30px;
+      text-align: center;
     }
-
-    .btn-lancer:hover {
-      background-color: #e02a3b;
+    h1 {
+      color: red;
+      font-size: 2em;
+      margin-bottom: 20px;
     }
-
-    .attente {
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 10px 0;
+      background-color: #1f1f1f;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1.1em;
+    }
+    .role {
       font-style: italic;
-      color: #bbb;
-      margin-top: 2rem;
-    }
-
-    .logo {
-      width: 150px;
-      margin-bottom: 1rem;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
 
-  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
-  <h1>🎥 Suivi des joueurs connectés</h1>
-  <p id="codeAffichage"></p>
+  <h1>🎬 Joueurs connectés</h1>
+  <p id="codePartie">Code de la partie : ...</p>
 
-  <div class="joueurs" id="listeJoueurs">
-    <p>Chargement...</p>
-  </div>
-
-  <div id="actionZone"></div>
+  <ul id="listeJoueurs">
+    <li>Chargement des joueurs...</li>
+  </ul>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import {
-      getFirestore, collection, onSnapshot, doc, updateDoc
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDV1oGErhV0Pt87PsZYiKFFmE4xh5BGMH8",
-      authDomain: "hollyblood-b320e.firebaseapp.com",
-      projectId: "hollyblood-b320e",
-      storageBucket: "hollyblood-b320e.appspot.com",
-      messagingSenderId: "907978882652",
-      appId: "1:907978882652:web:58505cf1d65a00635df099"
+      apiKey: "TA_CLE_API",
+      authDomain: "TON_PROJET.firebaseapp.com",
+      databaseURL: "https://TON_PROJET.firebaseio.com",
+      projectId: "TON_PROJET",
+      storageBucket: "TON_PROJET.appspot.com",
+      messagingSenderId: "TON_SENDER_ID",
+      appId: "TON_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getDatabase(app);
 
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
-    document.getElementById("codeAffichage").innerText = `🎬 Code de la partie : ${code}`;
 
-    const nomsComplets = {
-      "agent-securite": "L'Agent de Sécurité",
-      "assistante-production": "L’Assistante de Production",
-      "avocate-stars": "L’Avocate des Stars",
-      "chroniqueuse-mondaine": "La Chroniqueuse Mondaine",
-      "figurante": "La Figurante",
-      "maquilleuse-de-stars": "La Maquilleuse de Stars",
-      "paparazzi": "Le Paparazzi",
-      "producteur": "Le Producteur",
-      "realisateur": "Le Réalisateur",
-      "scenariste": "Le Scénariste"
-    };
+    if (!code) {
+      alert("Code de partie manquant.");
+      window.location.href = "index.html";
+    }
 
-    const liste = document.getElementById("listeJoueurs");
-    const actionZone = document.getElementById("actionZone");
+    document.getElementById("codePartie").innerText = `Code de la partie : ${code}`;
 
-    const joueurActuel = {
-      perso: localStorage.getItem("perso"),
-      role: localStorage.getItem("role")
-    };
+    const joueursRef = ref(db, 'parties/' + code + '/joueurs');
 
-    const estMJ = joueurActuel && joueurActuel.perso && joueurActuel.role;
-
-    // 🔁 Écoute la liste des joueurs
-    const q = collection(db, "joueurs-" + code);
-    onSnapshot(q, (snapshot) => {
+    onValue(joueursRef, (snapshot) => {
+      const data = snapshot.val();
+      const liste = document.getElementById("listeJoueurs");
       liste.innerHTML = "";
-      snapshot.forEach(doc => {
-        const joueur = doc.data();
-        const div = document.createElement("div");
-        div.className = "joueur";
-        const roleStr = joueur.role === "meurtrier" ? " 🔪" : "";
-        div.innerText = `🎭 ${nomsComplets[joueur.perso] || joueur.perso}${roleStr}`;
-        liste.appendChild(div);
-      });
 
-      actionZone.innerHTML = "";
-      if (estMJ) {
-        const btn = document.createElement("button");
-        btn.className = "btn-lancer";
-        btn.innerText = "🎬 Le casting est complet, la partie commence !";
-        btn.onclick = async () => {
-          await updateDoc(doc(db, "parties", code), {
-            etat: "en_cours"
-          });
-        };
-        actionZone.appendChild(btn);
-      } else {
-        const p = document.createElement("p");
-        p.className = "attente";
-        p.innerText = "🎬 Patientez... Le rideau se lèvera quand le joueur qui a généré la partie lancera le jeu.";
-        actionZone.appendChild(p);
+      if (!data) {
+        liste.innerHTML = "<li>Aucun joueur pour l’instant.</li>";
+        return;
       }
-    });
 
-    // 🔁 Écoute du lancement de la partie
-    const partieRef = doc(db, "parties", code);
-    onSnapshot(partieRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data.etat === "en_cours") {
-          window.location.href = "partie.html";
+      const noms = Object.keys(data);
+      noms.forEach((nom) => {
+        const joueur = data[nom];
+        const li = document.createElement("li");
+        let texte = `${joueur.personnage || nom}`;
+
+        if (joueur.role) {
+          texte += ` — <span class="role">${joueur.role}</span>`;
         }
-      }
+
+        if (joueur.role === "Meurtrier" && joueur.mobile) {
+          texte += ` (mobile : ${joueur.mobile})`;
+        }
+
+        li.innerHTML = texte;
+        liste.appendChild(li);
+      });
     });
   </script>
 

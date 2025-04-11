@@ -1,80 +1,122 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HollyBlood</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/png" href="img/logo.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
-
+  <meta charset="UTF-8">
+  <title>Hollywood Confidentiel</title>
+  <link rel="stylesheet" href="style.css">
   <style>
     body {
-      background-color: #1C1C1C;
-      color: #F4F4F4;
-      font-family: 'Inter', sans-serif;
+      background-color: #121212;
+      color: white;
+      font-family: 'Georgia', serif;
       text-align: center;
-      padding: 3rem 2rem;
+      padding: 30px;
     }
-
-    img.logo {
-      width: 220px;
-      margin-bottom: 2rem;
-    }
-
     h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
-      color: #C9A227;
-      margin-bottom: 1rem;
+      font-size: 2.2em;
+      color: red;
+      margin-bottom: 10px;
     }
-
     p {
-      font-style: italic;
-      margin-bottom: 2rem;
-      color: #CCCCCC;
+      font-size: 1.1em;
+      margin-bottom: 20px;
     }
-
-    .btns {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-      max-width: 300px;
-      margin: 0 auto;
+    #logo {
+      max-width: 250px;
+      margin-bottom: 30px;
     }
-
-    .btns button {
-      background-color: #D41427;
+    .button {
+      background-color: #8B0000;
       color: white;
       border: none;
-      border-radius: 8px;
-      padding: 1rem;
-      font-size: 1.1rem;
+      padding: 15px 25px;
+      font-size: 1.2em;
+      border-radius: 10px;
       cursor: pointer;
+      margin: 10px;
     }
-
-    .btns button:hover {
-      background-color: #e02a3b;
+    .button:hover {
+      background-color: #aa0000;
+    }
+    input {
+      padding: 10px;
+      font-size: 1.2em;
+      border-radius: 10px;
+      border: none;
+      width: 200px;
+      text-align: center;
+      margin-top: 10px;
+    }
+    button:disabled {
+      background-color: #444;
+      cursor: not-allowed;
     }
   </style>
 </head>
 <body>
 
-  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
-  <h1>Bienvenue dans HollyBlood</h1>
-  <p>🎥 Un crime sur fond de projecteurs... Saurez-vous élucider le mystère&nbsp;?</p>
+  <img src="img/logo.png" alt="Logo du jeu" id="logo">
 
-  <div class="btns">
-    <button onclick="window.location.href='creer.html'">🎬 Créer une partie</button>
-    <button onclick="window.location.href='rejoindre.html'">🎟️ Rejoindre une partie</button>
+  <h1>Hollywood Confidentiel</h1>
+  <p>🎬 Entrez dans les coulisses du mystère…</p>
+
+  <div>
+    <button class="button" onclick="creerPartie()">Créer une partie</button>
   </div>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('✅ SW enregistré'))
-        .catch(err => console.error('❌ SW erreur', err));
+  <div style="margin-top: 40px;">
+    <p>Vous avez reçu un code ?</p>
+    <input type="text" id="codePartie" placeholder="Code à 6 chiffres" maxlength="6" oninput="verifierCode()" />
+    <br>
+    <button class="button" id="boutonRejoindre" onclick="rejoindrePartie()" disabled>Rejoindre une partie</button>
+  </div>
+
+  <!-- Firebase App -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "TA_CLE_API",
+      authDomain: "TON_PROJET.firebaseapp.com",
+      databaseURL: "https://TON_PROJET.firebaseio.com",
+      projectId: "TON_PROJET",
+      storageBucket: "TON_PROJET.appspot.com",
+      messagingSenderId: "TON_SENDER_ID",
+      appId: "TON_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.creerPartie = async function () {
+      const scenar = "Hollywood Confidentiel";
+      const code = Math.floor(100000 + Math.random() * 900000);
+
+      // Enregistrement dans Firebase
+      await set(ref(db, 'parties/' + code), {
+        scenar: scenar,
+        createur: true,
+        joueurs: []
+      });
+
+      window.location.href = `page2-joueur.html?code=${code}&createur=1`;
+    }
+
+    window.verifierCode = function () {
+      const code = document.getElementById("codePartie").value;
+      document.getElementById("boutonRejoindre").disabled = !/^\d{6}$/.test(code);
+    }
+
+    window.rejoindrePartie = function () {
+      const code = document.getElementById("codePartie").value;
+      if (/^\d{6}$/.test(code)) {
+        window.location.href = `page2-joueur2.html?code=${code}`;
+      } else {
+        alert("Merci d’entrer un code à 6 chiffres.");
+      }
     }
   </script>
+
 </body>
 </html>

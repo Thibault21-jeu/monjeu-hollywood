@@ -1,126 +1,79 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hollyblood - Rejoindre une partie</title>
-  <link rel="icon" href="img/logo.png" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Rejoindre une partie</title>
+  <link rel="stylesheet" href="style.css">
   <style>
     body {
-      background-color: #1C1C1C;
-      color: #F4F4F4;
-      font-family: 'Inter', sans-serif;
+      background-color: #121212;
+      color: white;
+      font-family: 'Georgia', serif;
       text-align: center;
-      padding: 2rem;
+      padding: 30px;
     }
-
     h1 {
-      color: #C9A227;
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      margin-bottom: 1rem;
+      color: red;
+      font-size: 2em;
+      margin-bottom: 20px;
     }
-
     input {
-      padding: 1rem;
-      border-radius: 6px;
+      padding: 10px;
+      font-size: 1.2em;
+      border-radius: 10px;
       border: none;
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
       width: 200px;
       text-align: center;
+      margin-bottom: 20px;
     }
-
-    .btn-principal {
-      background-color: #D41427;
+    button {
+      background-color: #8B0000;
       color: white;
       border: none;
-      border-radius: 6px;
-      padding: 1rem;
-      font-size: 1.1rem;
+      padding: 12px 25px;
+      font-size: 1.2em;
+      border-radius: 10px;
       cursor: pointer;
     }
-
-    .btn-principal:hover {
-      background-color: #e02a3b;
+    button:disabled {
+      background-color: #444;
+      cursor: not-allowed;
     }
-
-    .logo {
-      width: 180px;
-      margin-bottom: 1rem;
+    #logo {
+      max-width: 200px;
+      margin-bottom: 30px;
     }
   </style>
 </head>
 <body>
 
-  <img src="img/logo.png" alt="Logo Hollyblood" class="logo" />
-  <h1>🎟️ Rejoindre une partie</h1>
+  <img src="img/logo.png" alt="Logo du jeu" id="logo">
 
-  <p>Entrez le code à 6 chiffres donné par le créateur de la partie :</p>
+  <h1>🎬 Rejoindre une partie</h1>
 
-  <input type="tel" id="codePartie" placeholder="ex : 123456" autocomplete="off" />
+  <input type="text" id="codePartie" placeholder="Code à 6 chiffres" maxlength="6" oninput="verifierCode()" />
 
-  <div>
-    <button class="btn-principal" onclick="rejoindrePartie()">Rejoindre</button>
-  </div>
+  <br><br>
 
-  <!-- Connexion à Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+  <button id="boutonRejoindre" onclick="rejoindrePartie()" disabled>Rejoindre la partie</button>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDV1oGErhV0Pt87PsZYiKFFmE4xh5BGMH8",
-      authDomain: "hollyblood-b320e.firebaseapp.com",
-      projectId: "hollyblood-b320e",
-      storageBucket: "hollyblood-b320e.appspot.com",
-      messagingSenderId: "907978882652",
-      appId: "1:907978882652:web:58505cf1d65a00635df099",
-      measurementId: "G-TD0KM8MTVM"
-    };
+  <script>
+    function verifierCode() {
+      const code = document.getElementById("codePartie").value;
+      const bouton = document.getElementById("boutonRejoindre");
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    async function rejoindrePartie() {
-      const code = document.getElementById("codePartie").value.trim();
-
-      // Code admin
-      if (code === "000000") {
-        const adminCode = prompt("🔐 Veuillez entrer le code administrateur :");
-        if (adminCode === "21051999") {
-          window.location.href = "admin.html";
-        } else {
-          alert("🚫 Code administrateur incorrect !");
-        }
-        return;
+      // Autorise uniquement 6 chiffres
+      if (/^\d{6}$/.test(code)) {
+        bouton.disabled = false;
+      } else {
+        bouton.disabled = true;
       }
+    }
 
-      // Vérification du format (6 chiffres uniquement)
-      if (!/^\d{6}$/.test(code)) {
-        alert("Veuillez entrer un code à 6 chiffres valide.");
-        return;
-      }
-
-      if (code === "210519") {
-        alert("Ce code n'est pas autorisé.");
-        return;
-      }
-
-      try {
-        const partieRef = doc(db, "parties", code);
-        const docSnap = await getDoc(partieRef);
-
-        if (docSnap.exists()) {
-          window.location.href = `page2-joueur2.html?code=${code}`;
-        } else {
-          alert("❌ Cette partie n'existe pas.");
-        }
-      } catch (error) {
-        console.error("Erreur Firebase :", error);
-        alert("Erreur lors de la connexion à la base de données.");
-      }
+    function rejoindrePartie() {
+      const code = document.getElementById("codePartie").value;
+      localStorage.setItem("code", code); // stocké pour la suite
+      window.location.href = `page2-joueur2.html?code=${code}`;
     }
   </script>
 

@@ -75,27 +75,45 @@
     <button onclick="allerEtapeSuivante('scenariste', 1)">Le Scénariste</button>
   </div>
 
-  <script>
-    // Récupération depuis URL ou localStorage
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "TA_CLE_API",
+      authDomain: "TON_PROJET.firebaseapp.com",
+      databaseURL: "https://TON_PROJET.firebaseio.com",
+      projectId: "TON_PROJET",
+      storageBucket: "TON_PROJET.appspot.com",
+      messagingSenderId: "TON_SENDER_ID",
+      appId: "TON_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
     const urlParams = new URLSearchParams(window.location.search);
-    const scenar = urlParams.get("scenar") || localStorage.getItem("scenar");
-    const code = urlParams.get("code") || localStorage.getItem("code");
+    const code = urlParams.get("code");
+    const createur = urlParams.get("createur");
 
-    // Enregistrement dans localStorage
-    if (scenar) localStorage.setItem("scenar", scenar);
-    if (code) localStorage.setItem("code", code);
-
-    // Affichage du nom de la partie
-    if (scenar) {
-      document.getElementById("partieInfo").innerText = "Partie : " + scenar;
-    } else {
-      alert("Nom du scénario manquant. Veuillez recommencer depuis l'accueil.");
+    if (!code) {
+      alert("Code de partie manquant.");
       window.location.href = "index.html";
     }
 
-    function allerEtapeSuivante(perso, createur) {
-      if (!code || !scenar || !perso) {
-        alert("Informations manquantes. Merci de recommencer depuis la page d’accueil.");
+    const snapshot = await get(ref(db, 'parties/' + code));
+
+    if (!snapshot.exists()) {
+      alert("Partie introuvable. Veuillez recommencer.");
+      window.location.href = "index.html";
+    }
+
+    const scenar = snapshot.val().scenar;
+    document.getElementById("partieInfo").innerText = "Partie : " + scenar;
+
+    window.allerEtapeSuivante = function(perso, createur) {
+      if (!perso || !code) {
+        alert("Informations manquantes.");
         window.location.href = "index.html";
         return;
       }
@@ -103,7 +121,7 @@
       localStorage.setItem("perso", perso);
       localStorage.setItem("createur", createur);
 
-      const url = `page3-joueur.html?perso=${perso}&createur=${createur}&code=${code}&scenar=${encodeURIComponent(scenar)}`;
+      const url = `page3-joueur.html?perso=${perso}&createur=${createur}&code=${code}`;
       window.location.href = url;
     }
   </script>

@@ -2,124 +2,107 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HollyBlood - Choix du rôle</title>
+  <title>Choix du rôle</title>
   <link rel="stylesheet" href="style.css">
   <style>
     body {
-      background-color: #1C1C1C;
-      color: #F4F4F4;
-      font-family: 'Inter', sans-serif;
-      text-align: center;
-      padding: 2rem;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      color: #C9A227;
-      font-family: 'Playfair Display', serif;
-      margin-bottom: 1rem;
-    }
-
-    .btn {
-      display: block;
-      margin: 1rem auto;
-      padding: 1rem 2rem;
-      font-size: 1.1rem;
-      background-color: #D41427;
-      border: none;
-      border-radius: 8px;
+      background-color: #121212;
       color: white;
+      font-family: 'Georgia', serif;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      color: red;
+      font-size: 1.8em;
+      margin-bottom: 20px;
+    }
+    .role-btn, .mobile-btn {
+      background-color: #8B0000;
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      font-size: 1.2em;
+      border-radius: 10px;
       cursor: pointer;
+      margin: 10px;
+      display: inline-block;
     }
-
-    .btn:hover {
-      background-color: #e02a3b;
+    .role-btn:hover, .mobile-btn:hover {
+      background-color: #aa0000;
     }
-
-    .mobile-choices {
-      margin-top: 2rem;
+    #mobiles {
+      display: none;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h1>🎭 Qui êtes-vous vraiment ?</h1>
-  <p id="info"></p>
+  <h1 id="titre">Quel est votre rôle ?</h1>
 
-  <button class="btn" onclick="choisirRole('innocent')">Je suis Innocent</button>
-  <button class="btn" onclick="afficherMobiles()">Je suis le Meurtrier</button>
+  <button class="role-btn" onclick="choisirRole('Innocent')">Je suis Innocent</button>
+  <button class="role-btn" onclick="choisirRole('Meurtrier')">Je suis le Meurtrier</button>
 
-  <div class="mobile-choices" id="mobiles" style="display:none;">
-    <h2>Choisissez votre mobile</h2>
-    <button class="btn" onclick="choisirMobile('Vengeance personnelle')">Vengeance personnelle</button>
-    <button class="btn" onclick="choisirMobile('Avidité')">Avidité</button>
-    <button class="btn" onclick="choisirMobile('Passion & Jalousie')">Passion & Jalousie</button>
-    <button class="btn" onclick="choisirMobile('Protection d’un secret')">Protection d’un secret</button>
+  <div id="mobiles">
+    <h2>Quel est votre mobile ?</h2>
+    <button class="mobile-btn" onclick="validerMeurtrier('Vengeance personnelle')">Vengeance personnelle</button>
+    <button class="mobile-btn" onclick="validerMeurtrier('Avidité')">Avidité</button>
+    <button class="mobile-btn" onclick="validerMeurtrier('Passion & Jalousie')">Passion & Jalousie</button>
+    <button class="mobile-btn" onclick="validerMeurtrier('Protection d’un secret')">Protection d’un secret</button>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import {
-      getFirestore, collection, getDocs, query, where, updateDoc, doc
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDV1oGErhV0Pt87PsZYiKFFmE4xh5BGMH8",
-      authDomain: "hollyblood-b320e.firebaseapp.com",
-      projectId: "hollyblood-b320e",
-      storageBucket: "hollyblood-b320e.appspot.com",
-      messagingSenderId: "907978882652",
-      appId: "1:907978882652:web:58505cf1d65a00635df099"
+      apiKey: "TA_CLE_API",
+      authDomain: "TON_PROJET.firebaseapp.com",
+      databaseURL: "https://TON_PROJET.firebaseio.com",
+      projectId: "TON_PROJET",
+      storageBucket: "TON_PROJET.appspot.com",
+      messagingSenderId: "TON_SENDER_ID",
+      appId: "TON_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getDatabase(app);
 
-    const code = localStorage.getItem("codePartie");
-    const perso = localStorage.getItem("perso");
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    const perso = urlParams.get("perso");
 
     if (!code || !perso) {
-      alert("Erreur : informations manquantes.");
+      alert("Informations manquantes. Veuillez recommencer.");
       window.location.href = "index.html";
     }
 
-    document.getElementById("info").innerText = `🎬 Partie : ${code} — Personnage : ${perso}`;
-
-    async function choisirRole(role) {
-      const joueursRef = collection(db, "joueurs-" + code);
-      const q = query(joueursRef, where("perso", "==", perso));
-      const snapshot = await getDocs(q);
-      if (!snapshot.empty) {
-        const joueurDoc = snapshot.docs[0];
-        await updateDoc(doc(db, "joueurs-" + code, joueurDoc.id), {
-          role: role,
-          mobile: null
-        });
-        localStorage.setItem("role", role);
-        localStorage.setItem("mobile", "");
-        window.location.href = `suivi.html?code=${code}`;
+    function choisirRole(role) {
+      if (role === "Innocent") {
+        enregistrerJoueur(role);
+      } else {
+        document.getElementById("mobiles").style.display = "block";
+        document.getElementById("titre").innerText = "Choisissez un mobile pour votre crime...";
       }
     }
 
-    function afficherMobiles() {
-      document.getElementById("mobiles").style.display = "block";
+    function validerMeurtrier(mobile) {
+      enregistrerJoueur("Meurtrier", mobile);
     }
 
-    async function choisirMobile(mobile) {
-      const joueursRef = collection(db, "joueurs-" + code);
-      const q = query(joueursRef, where("perso", "==", perso));
-      const snapshot = await getDocs(q);
-      if (!snapshot.empty) {
-        const joueurDoc = snapshot.docs[0];
-        await updateDoc(doc(db, "joueurs-" + code, joueurDoc.id), {
-          role: "meurtrier",
-          mobile: mobile
-        });
-        localStorage.setItem("role", "meurtrier");
-        localStorage.setItem("mobile", mobile);
-        window.location.href = `suivi.html?code=${code}`;
-      }
+    async function enregistrerJoueur(role, mobile = null) {
+      const joueur = {
+        personnage: perso,
+        role: role,
+        mobile: mobile,
+        createur: true
+      };
+
+      const joueursRef = ref(db, 'parties/' + code + '/joueurs/' + perso);
+      await update(joueursRef, joueur);
+
+      window.location.href = `suivi.html?code=${code}`;
     }
   </script>
 

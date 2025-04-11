@@ -2,140 +2,127 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HollyBlood - Choix du personnage</title>
+  <title>Distribution des rôles</title>
   <link rel="stylesheet" href="style.css">
   <style>
     body {
-      background-color: #1C1C1C;
-      color: #F4F4F4;
-      font-family: 'Inter', sans-serif;
+      background-color: #121212;
+      color: white;
+      font-family: 'Georgia', serif;
       text-align: center;
-      padding: 2rem;
+      padding: 20px;
     }
-
     h1 {
-      font-size: 1.8rem;
-      color: #C9A227;
-      font-family: 'Playfair Display', serif;
-      margin-bottom: 1rem;
+      color: red;
+      text-align: left;
+      font-size: 1.6em;
     }
-
-    .perso-btn {
-      display: inline-block;
-      margin: 0.5rem;
-      padding: 1rem;
-      border: 2px solid #C9A227;
-      border-radius: 8px;
-      background-color: transparent;
-      color: #F4F4F4;
-      font-size: 1rem;
-      width: 200px;
+    h2 {
+      color: red;
+      font-size: 2em;
+      margin-top: 30px;
+    }
+    .sous-titre {
+      font-style: italic;
+      color: white;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    .boutons-personnages {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    button {
+      background-color: #8B0000;
+      color: white;
+      border: none;
+      padding: 15px;
+      font-size: 1em;
+      border-radius: 10px;
       cursor: pointer;
+      width: 100%;
     }
-
-    .perso-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
+    button:hover {
+      background-color: #aa0000;
     }
-
-    .logo {
-      width: 150px;
-      margin-bottom: 1rem;
+    #logo {
+      max-width: 200px;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
 
-  <img src="img/logo.png" alt="Logo HollyBlood" class="logo" />
-  <h1>🎭 Choisissez votre personnage</h1>
-  <p id="codeAffichage"></p>
+  <img src="img/logo.png" alt="Logo du jeu" id="logo">
 
-  <div id="personnages"></div>
+  <h1 id="partieInfo">Partie :</h1>
+  <h2>Distribution des rôles</h2>
+  <p class="sous-titre">Je suis...</p>
+
+  <div class="boutons-personnages">
+    <button onclick="allerEtapeSuivante('agent-securite', 0)">L'Agent de Sécurité</button>
+    <button onclick="allerEtapeSuivante('assistante-production', 0)">L'Assistante de Production</button>
+    <button onclick="allerEtapeSuivante('avocate-stars', 0)">L'Avocate des Stars</button>
+    <button onclick="allerEtapeSuivante('chroniqueuse-mondaine', 0)">La Chroniqueuse Mondaine</button>
+    <button onclick="allerEtapeSuivante('figurante', 0)">La Figurante</button>
+    <button onclick="allerEtapeSuivante('maquilleuse-de-stars', 0)">La Maquilleuse de Stars</button>
+    <button onclick="allerEtapeSuivante('paparazzi', 0)">Le Paparazzi</button>
+    <button onclick="allerEtapeSuivante('producteur', 0)">Le Producteur</button>
+    <button onclick="allerEtapeSuivante('realisateur', 0)">Le Réalisateur</button>
+    <button onclick="allerEtapeSuivante('scenariste', 0)">Le Scénariste</button>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import {
-      getFirestore, collection, addDoc, getDocs, query, where
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDV1oGErhV0Pt87PsZYiKFFmE4xh5BGMH8",
-      authDomain: "hollyblood-b320e.firebaseapp.com",
-      projectId: "hollyblood-b320e",
-      storageBucket: "hollyblood-b320e.appspot.com",
-      messagingSenderId: "907978882652",
-      appId: "1:907978882652:web:58505cf1d65a00635df099"
+      apiKey: "TA_CLE_API",
+      authDomain: "TON_PROJET.firebaseapp.com",
+      databaseURL: "https://TON_PROJET.firebaseio.com",
+      projectId: "TON_PROJET",
+      storageBucket: "TON_PROJET.appspot.com",
+      messagingSenderId: "TON_SENDER_ID",
+      appId: "TON_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getDatabase(app);
 
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
 
     if (!code) {
-      alert("Aucun code de partie trouvé dans l’URL.");
-      location.href = "rejoindre.html";
+      alert("Code de partie manquant.");
+      window.location.href = "index.html";
     }
 
-    document.getElementById("codeAffichage").innerText = `🎬 Code de la partie : ${code}`;
+    const snapshot = await get(ref(db, 'parties/' + code));
 
-    const personnages = [
-      "agent-securite",
-      "assistante-production",
-      "avocate-stars",
-      "chroniqueuse-mondaine",
-      "figurante",
-      "maquilleuse-de-stars",
-      "paparazzi",
-      "producteur",
-      "realisateur",
-      "scenariste"
-    ];
-
-    const nomsComplets = {
-      "agent-securite": "L'Agent de Sécurité",
-      "assistante-production": "L’Assistante de Production",
-      "avocate-stars": "L’Avocate des Stars",
-      "chroniqueuse-mondaine": "La Chroniqueuse Mondaine",
-      "figurante": "La Figurante",
-      "maquilleuse-de-stars": "La Maquilleuse de Stars",
-      "paparazzi": "Le Paparazzi",
-      "producteur": "Le Producteur",
-      "realisateur": "Le Réalisateur",
-      "scenariste": "Le Scénariste"
-    };
-
-    const container = document.getElementById("personnages");
-
-    async function afficherPersonnages() {
-      const joueursSnap = await getDocs(collection(db, "joueurs-" + code));
-      const persosDejaPris = joueursSnap.docs.map(doc => doc.data().perso);
-
-      personnages.forEach(perso => {
-        const btn = document.createElement("button");
-        btn.className = "perso-btn";
-        btn.innerText = nomsComplets[perso];
-        btn.disabled = persosDejaPris.includes(perso);
-
-        btn.onclick = async () => {
-          await addDoc(collection(db, "joueurs-" + code), {
-            perso: perso,
-            role: "innocent",
-            mobile: null,
-            timestamp: Date.now()
-          });
-
-          alert("🎉 Personnage sélectionné !");
-          window.location.href = `suivi.html?code=${code}`;
-        };
-
-        container.appendChild(btn);
-      });
+    if (!snapshot.exists()) {
+      alert("Partie introuvable. Veuillez recommencer.");
+      window.location.href = "index.html";
     }
 
-    afficherPersonnages();
+    const scenar = snapshot.val().scenar;
+    document.getElementById("partieInfo").innerText = "Partie : " + scenar;
+
+    window.allerEtapeSuivante = function(perso, createur) {
+      if (!perso || !code) {
+        alert("Informations manquantes.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      localStorage.setItem("perso", perso);
+      localStorage.setItem("createur", createur);
+
+      const url = `page3-joueur2.html?perso=${perso}&createur=${createur}&code=${code}`;
+      window.location.href = url;
+    }
   </script>
 
 </body>
