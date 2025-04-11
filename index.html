@@ -71,19 +71,19 @@
     <button class="button" id="boutonRejoindre" onclick="rejoindrePartie()" disabled>Rejoindre une partie</button>
   </div>
 
-  <!-- Firebase CDN -->
+  <!-- Firebase Compat CDN -->
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database-compat.js"></script>
 
   <script>
     const firebaseConfig = {
-      apiKey: "TA_CLE_API",
-      authDomain: "TON_PROJET.firebaseapp.com",
-      databaseURL: "https://TON_PROJET.firebaseio.com",
-      projectId: "TON_PROJET",
-      storageBucket: "TON_PROJET.appspot.com",
-      messagingSenderId: "TON_SENDER_ID",
-      appId: "TON_APP_ID"
+      apiKey: "AIzaSyAyxLuqhf9kXRUYc-w2rESe6ETGVzr5mPM",
+      authDomain: "hollyblood-91a3c.firebaseapp.com",
+      databaseURL: "https://hollyblood-91a3c-default-rtdb.firebaseio.com",
+      projectId: "hollyblood-91a3c",
+      storageBucket: "hollyblood-91a3c.appspot.com",
+      messagingSenderId: "930359065857",
+      appId: "1:930359065857:web:1258520c6b2915a646ef00"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -97,7 +97,6 @@
       const scenar = "Hollywood Confidentiel";
       const code = genererCodePartie();
 
-      // Créer la partie dans Firebase
       db.ref("parties/" + code).set({
         scenar: scenar,
         createur: true,
@@ -105,7 +104,7 @@
       }).then(() => {
         window.location.href = `page2-joueur.html?code=${code}&createur=1`;
       }).catch((error) => {
-        alert("Erreur lors de la création de la partie : " + error.message);
+        alert("Erreur lors de la création : " + error.message);
       });
     }
 
